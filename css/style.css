@@ -65,15 +65,16 @@ nav a.active {
 }
 
 /* =============================
-   HERO SLIDER
+   HERO CINEMATIC ELITE
 ============================= */
+
 .hero-slider {
   position: relative;
   height: 100vh;
+  overflow: hidden;
   display: flex;
   align-items: center;
   margin-top: 80px;
-  overflow: hidden;
 }
 
 .slide {
@@ -83,23 +84,38 @@ nav a.active {
   background-size: cover;
   background-position: center;
   opacity: 0;
-  transition: opacity 1s ease-in-out;
+  transform: scale(1);
+  transition: opacity 1.5s ease-in-out, transform 6s ease-in-out;
 }
 
 .slide.active {
-  opacity: 0.25;
+  opacity: 1;
+  transform: scale(1.1); /* zoom cinematic */
 }
 
-.hero-slider .container {
+.hero-overlay {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    to right,
+    rgba(0,0,0,0.8),
+    rgba(0,0,0,0.5)
+  );
+  z-index: 1;
+}
+
+.hero-content {
   position: relative;
   z-index: 2;
   max-width: 700px;
+  animation: fadeUp 1.5s ease forwards;
 }
 
 .hero-tag {
   background: #d4af37;
   color: #000;
-  padding: 6px 14px;
+  padding: 8px 16px;
   font-size: 12px;
   font-weight: bold;
   display: inline-block;
@@ -108,7 +124,7 @@ nav a.active {
 }
 
 .hero-slider h1 {
-  font-size: 44px;
+  font-size: 48px;
   margin-bottom: 20px;
 }
 
@@ -117,8 +133,21 @@ nav a.active {
 }
 
 .hero-slider p {
+  color: #ddd;
   margin-bottom: 30px;
-  color: #ccc;
+  font-size: 16px;
+}
+
+/* Animasi text */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* =============================
