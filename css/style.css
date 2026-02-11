@@ -34,9 +34,7 @@ body {
 }
 
 .logo {
-  color: #d4af37;
-  font-weight: 800;
-  letter-spacing: 1px;
+  height: 48px;
 }
 
 .nav a {
