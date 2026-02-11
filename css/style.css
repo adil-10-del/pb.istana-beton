@@ -1,14 +1,16 @@
-/* ================= RESET ================= */
+/* =============================
+   RESET & GLOBAL
+============================= */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: "Segoe UI", Arial, sans-serif;
 }
 
 body {
-  background: #ffffff;
-  color: #222;
+  font-family: 'Segoe UI', sans-serif;
+  background: #0f0f0f;
+  color: #ffffff;
   line-height: 1.6;
 }
 
@@ -18,259 +20,326 @@ body {
   margin: auto;
 }
 
-/* ================= HEADER ================= */
-.header {
-  position: sticky;
-  top: 0;
-  z-index: 999;
-  background: rgba(255,255,255,.95);
-  backdrop-filter: blur(6px);
-  box-shadow: 0 2px 15px rgba(0,0,0,.08);
+h1, h2, h3 {
+  font-weight: 700;
 }
 
-.navbar {
-  max-width: 1200px;
-  margin: auto;
-  padding: 15px 30px;
+section {
+  padding: 80px 0;
+}
+
+/* =============================
+   HEADER
+============================= */
+.header {
+  background: #111;
+  position: fixed;
+  width: 100%;
+  top: 0;
+  z-index: 999;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.header-flex {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 15px 0;
 }
 
 .logo {
-  height: 48px;
+  height: 50px;
 }
 
-.navbar nav a {
-  margin-left: 28px;
-  font-weight: 600;
-  color: #333;
-  position: relative;
+nav a {
+  color: #ccc;
+  text-decoration: none;
+  margin-left: 25px;
+  font-weight: 500;
+  transition: 0.3s;
 }
 
-.navbar nav a::after {
-  content: "";
-  position: absolute;
-  bottom: -6px;
-  left: 0;
-  width: 0;
-  height: 2px;
-  background: var(--primary);
-  transition: .3s;
+nav a:hover,
+nav a.active {
+  color: #d4af37;
 }
 
-.navbar nav a:hover::after,
-.navbar nav a.active::after {
-  width: 100%;
-}
-/* ================= HERO ================= */
+/* =============================
+   HERO SLIDER
+============================= */
 .hero-slider {
   position: relative;
-  height: 90vh;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  margin-top: 80px;
   overflow: hidden;
 }
 
 .slide {
   position: absolute;
-  inset: 0;
+  width: 100%;
+  height: 100%;
   background-size: cover;
   background-position: center;
   opacity: 0;
-  transition: opacity 1.2s ease-in-out;
-  transform: scale(1.05);
+  transition: opacity 1s ease-in-out;
 }
 
 .slide.active {
-  opacity: 1;
-  transform: scale(1);
+  opacity: 0.25;
 }
 
-/* Overlay gelap */
-.hero-content {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    rgba(0,0,0,.55),
-    rgba(0,0,0,.65)
-  );
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  color: white;
+.hero-slider .container {
+  position: relative;
   z-index: 2;
+  max-width: 700px;
 }
 
 .hero-tag {
+  background: #d4af37;
+  color: #000;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: bold;
+  display: inline-block;
+  margin-bottom: 20px;
+  letter-spacing: 1px;
+}
+
+.hero-slider h1 {
+  font-size: 44px;
+  margin-bottom: 20px;
+}
+
+.hero-slider h1 span {
   color: #d4af37;
-  font-size: 13px;
-  letter-spacing: 2px;
 }
 
-.hero h1 {
-  font-size: 42px;
-  margin: 20px 0;
+.hero-slider p {
+  margin-bottom: 30px;
+  color: #ccc;
 }
 
-.hero h1 span {
-  color: #d4af37;
-}
-
-.hero p {
-  max-width: 800px;
-  margin: auto;
-  color: #ddd;
-}
-
+/* =============================
+   BUTTON
+============================= */
 .btn-primary {
   display: inline-block;
-  margin-top: 35px;
   background: #d4af37;
-  color: #111;
-  padding: 16px 30px;
+  color: #000;
+  padding: 15px 28px;
   border-radius: 6px;
-  font-weight: 700;
+  text-decoration: none;
+  font-weight: bold;
+  transition: 0.3s;
 }
-@keyframes fadeUp {
-  from {
-    opacity: 0;
-    transform: translateY(25px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+
+.btn-primary:hover {
+  background: #f1c84c;
+  transform: translateY(-2px);
 }
-/* ================= TRUST STRIP ================= */
+
+/* =============================
+   TRUST STRIP
+============================= */
 .trust-strip {
-  background: #111;
-  color: #eee;
+  background: #d4af37;
+  color: #000;
   text-align: center;
-  padding: 12px;
-  font-size: 14px;
+  padding: 15px;
+  font-weight: 600;
 }
 
-/* ================= PRODUCTS ================= */
-.products {
-  padding: 80px 0;
-}
-
+/* =============================
+   PRODUCTS
+============================= */
 .products h2 {
   text-align: center;
-  margin-bottom: 40px;
+  margin-bottom: 50px;
+  font-size: 32px;
 }
 
 .product-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: 25px;
 }
 
 .product-card {
-  border: 1px solid #e0e0e0;
-  padding: 35px 20px;
+  background: #1a1a1a;
+  padding: 40px 20px;
   text-align: center;
-  font-weight: 700;
   border-radius: 8px;
-  transition: .3s;
+  font-weight: 600;
+  transition: 0.3s;
+  border: 1px solid rgba(255,255,255,0.05);
 }
 
 .product-card:hover {
+  transform: translateY(-8px);
   border-color: #d4af37;
-  color: #d4af37;
-  transform: translateY(-4px);
 }
 
-/* ================= ADVANTAGES ================= */
+/* =============================
+   ADVANTAGES
+============================= */
 .advantages {
-  background: #f7f7f7;
-  padding: 80px 0;
+  background: #111;
 }
 
 .advantages h2 {
   text-align: center;
-  margin-bottom: 40px;
+  margin-bottom: 50px;
+  font-size: 32px;
 }
 
 .adv-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px,1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: 25px;
 }
 
 .adv-box {
-  background: #fff;
-  padding: 30px;
+  background: #1a1a1a;
+  padding: 35px;
   border-radius: 8px;
+  text-align: center;
+  transition: 0.3s;
 }
 
-/* ================= SEGMENT ================= */
-.segment {
-  padding: 70px 0;
+.adv-box h3 {
+  color: #d4af37;
+  margin-bottom: 15px;
+}
+
+.adv-box:hover {
+  transform: translateY(-5px);
+}
+
+/* =============================
+   SEGMENT
+============================= */
+.segment h2 {
   text-align: center;
+  margin-bottom: 40px;
 }
 
 .segment-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  margin-top: 30px;
+  display: flex;
+  justify-content: center;
+  gap: 30px;
 }
 
 .segment-grid a {
-  padding: 20px;
-  background: #111;
+  background: #1a1a1a;
+  padding: 25px 35px;
+  border-radius: 8px;
+  text-decoration: none;
   color: #fff;
-  font-weight: 700;
-  border-radius: 6px;
+  font-weight: bold;
+  transition: 0.3s;
 }
 
-/* ================= FINAL CTA ================= */
-.final-cta {
+.segment-grid a:hover {
   background: #d4af37;
-  padding: 80px 0;
+  color: #000;
+}
+
+/* =============================
+   FINAL CTA
+============================= */
+.final-cta {
+  background: linear-gradient(135deg, #1a1a1a, #111);
   text-align: center;
 }
 
 .final-cta h2 {
-  color: #111;
+  font-size: 34px;
+  margin-bottom: 15px;
 }
 
-/* ================= FOOTER ================= */
+.final-cta p {
+  margin-bottom: 30px;
+  color: #ccc;
+}
+
+/* =============================
+   FOOTER
+============================= */
 .footer {
-  background: #0f0f0f;
-  color: #aaa;
+  background: #000;
   text-align: center;
   padding: 25px;
-  font-size: 13px;
+  font-size: 14px;
+  color: #aaa;
 }
 
-/* ================= STICKY WA ================= */
+/* =============================
+   STICKY WA
+============================= */
 .wa-sticky {
   position: fixed;
-  bottom: 18px;
-  right: 18px;
+  bottom: 20px;
+  right: 20px;
   background: #25d366;
   color: #fff;
   padding: 14px 20px;
   border-radius: 50px;
-  font-weight: 700;
-  box-shadow: 0 8px 20px rgba(0,0,0,.3);
-  z-index: 9999;
+  font-weight: bold;
+  text-decoration: none;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  transition: 0.3s;
 }
 
-/* ================= MOBILE ================= */
-@media (max-width: 768px) {
-  .hero {
-    padding: 80px 0;
+.wa-sticky:hover {
+  transform: scale(1.05);
+}
+
+/* =============================
+   RESPONSIVE (MOBILE ELITE)
+============================= */
+@media(max-width: 992px) {
+
+  .product-grid,
+  .adv-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 
-  .hero h1 {
-    font-size: 28px;
+  .hero-slider h1 {
+    font-size: 34px;
+  }
+
+}
+
+@media(max-width: 600px) {
+
+  nav {
+    display: none;
+  }
+
+  .hero-slider {
+    height: 90vh;
+    text-align: center;
+  }
+
+  .hero-slider h1 {
+    font-size: 26px;
+  }
+
+  .product-grid,
+  .adv-grid {
+    grid-template-columns: 1fr;
   }
 
   .segment-grid {
-    grid-template-columns: 1fr;
+    flex-direction: column;
+    gap: 20px;
   }
+
+  section {
+    padding: 60px 0;
+  }
+
 }
+
