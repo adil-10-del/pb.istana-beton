@@ -250,6 +250,20 @@ function openLightbox(src){
 function closeLightbox(){
   document.getElementById("lightbox").style.display="none";
 }
+
+/* Scroll Reveal */
+window.addEventListener("scroll", function(){
+  let reveals = document.querySelectorAll(".reveal");
+  reveals.forEach(function(el){
+    let windowHeight = window.innerHeight;
+    let elementTop = el.getBoundingClientRect().top;
+    let elementVisible = 100;
+
+    if(elementTop < windowHeight - elementVisible){
+      el.classList.add("active");
+    }
+  });
+});
 </script>
 
 </body>
