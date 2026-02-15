@@ -3,33 +3,73 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Daftar Artikel</title>
+<title>Artikel - PB. Istana Beton</title>
 
 <style>
-body{font-family:Arial;margin:0;background:#f5f5f5;}
-.container{max-width:1200px;margin:auto;padding:40px 20px;}
-#articleList{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
-gap:25px;
-margin-top:30px;
+body{margin:0;font-family:Arial;background:#f4f4f4;}
+
+nav{
+background:#111;
+padding:15px 30px;
+display:flex;
+justify-content:space-between;
+align-items:center;
 }
-.article-card{
+
+nav a{
+color:#fff;
+text-decoration:none;
+margin-left:20px;
+font-size:14px;
+}
+
+.container{
+max-width:1200px;
+margin:auto;
+padding:40px 20px;
+}
+
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+gap:25px;
+}
+
+.card{
 background:#fff;
-border-radius:12px;
+border-radius:10px;
 overflow:hidden;
-box-shadow:0 4px 15px rgba(0,0,0,0.08);
+box-shadow:0 4px 12px rgba(0,0,0,0.08);
+transition:0.3s;
 display:flex;
 flex-direction:column;
 }
-.article-card img,.article-card video{
+
+.card:hover{
+transform:translateY(-5px);
+}
+
+.card img,
+.card video{
 width:100%;
-height:200px;
+height:220px;
 object-fit:cover;
 }
-.article-content{padding:18px;flex:1;display:flex;flex-direction:column;}
-.meta{font-size:13px;color:#777;margin-bottom:15px;}
-.read-btn{
+
+.card-body{
+padding:15px;
+display:flex;
+flex-direction:column;
+flex:1;
+}
+
+.meta{
+font-size:12px;
+color:#777;
+margin-bottom:10px;
+}
+
+.btn{
 margin-top:auto;
 background:#111;
 color:#fff;
@@ -37,16 +77,25 @@ padding:10px;
 text-align:center;
 border-radius:6px;
 text-decoration:none;
+font-size:14px;
 }
 </style>
 </head>
 <body>
 
-<div class="container">
-<h1>Artikel</h1>
-<a href="submit.html">+ Tulis Artikel</a>
+<nav>
+<div style="color:#fff;font-weight:bold;">PB. Istana Beton</div>
+<div>
+<a href="../index.html">Beranda</a>
+<a href="../produk/index.html">Produk</a>
+<a href="index.html">Artikel</a>
+<a href="submit.html">Tulis Artikel</a>
+</div>
+</nav>
 
-<div id="articleList"></div>
+<div class="container">
+<h1>Artikel & Edukasi</h1>
+<div class="grid" id="articleList"></div>
 </div>
 
 <script src="artikel-data.js"></script>
@@ -60,22 +109,21 @@ articleList.innerHTML="";
 
 data.forEach(a=>{
 
-let firstMedia=a.media[0];
 let mediaPreview="";
 
-if(firstMedia.type.startsWith("video")){
-mediaPreview=`<video src="${firstMedia.url}" muted></video>`;
+if(a.mediaType && a.mediaType.startsWith("video")){
+mediaPreview=`<video src="${a.media}" muted></video>`;
 }else{
-mediaPreview=`<img src="${firstMedia.url}">`;
+mediaPreview=`<img src="${a.media}">`;
 }
 
 articleList.innerHTML+=`
-<div class="article-card">
+<div class="card">
 ${mediaPreview}
-<div class="article-content">
+<div class="card-body">
 <h3>${a.title}</h3>
 <div class="meta">${a.author} • ${a.date} • ${a.category}</div>
-<a href="view.html?id=${a.id}" class="read-btn">Baca Artikel</a>
+<a href="view.html?id=${a.id}" class="btn">Baca Artikel</a>
 </div>
 </div>
 `;
@@ -88,6 +136,7 @@ render(articles);
 
 </body>
 </html>
+
 
 
 
