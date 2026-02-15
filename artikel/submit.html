@@ -1,1 +1,99 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tulis Artikel</title>
+<link rel="stylesheet" href="../css/style.css">
+
+<style>
+
+.container{
+  max-width:700px;
+  margin:auto;
+  padding:40px 20px;
+}
+
+form{
+  display:flex;
+  flex-direction:column;
+  gap:15px;
+}
+
+input, textarea, select{
+  padding:12px;
+  border-radius:8px;
+  border:1px solid #ccc;
+}
+
+textarea{
+  min-height:200px;
+}
+
+button{
+  padding:12px;
+  background:#111;
+  color:#fff;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+}
+
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Tulis Artikel</h1>
+
+  <form id="formArtikel">
+    <input type="text" id="title" placeholder="Judul Artikel" required>
+    <input type="text" id="author" placeholder="Nama Penulis" required>
+    <input type="date" id="date" required>
+
+    <select id="category" required>
+      <option value="">Pilih Kategori</option>
+      <option>Tips & Tutorial</option>
+      <option>Edukasi Material</option>
+      <option>Inspirasi Desain</option>
+    </select>
+
+    <input type="text" id="thumbnail" placeholder="URL Thumbnail (opsional)">
+    <textarea id="content" placeholder="Isi Artikel..." required></textarea>
+
+    <button type="submit">Publikasikan</button>
+  </form>
+</div>
+
+<script src="artikel-data.js"></script>
+<script>
+
+document.getElementById("formArtikel")
+.addEventListener("submit", function(e){
+
+  e.preventDefault();
+
+  const newArticle = {
+    id: Date.now().toString(),
+    title: title.value,
+    author: author.value,
+    date: date.value,
+    category: category.value,
+    thumbnail: thumbnail.value,
+    content: "<p>"+content.value.replace(/\n/g,"</p><p>")+"</p>"
+  };
+
+  let local = JSON.parse(localStorage.getItem("articles")) || [];
+  local.push(newArticle);
+  localStorage.setItem("articles", JSON.stringify(local));
+
+  alert("Artikel berhasil dipublikasikan!");
+  window.location.href="index.html";
+
+});
+
+</script>
+
+</body>
+</html>
 
