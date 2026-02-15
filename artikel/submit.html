@@ -77,13 +77,8 @@ button{
   </form>
 </div>
 
+<script src="artikel-data.js"></script>
 <script>
-
-function slugify(text){
-  return text.toLowerCase()
-    .replace(/[^\w ]+/g,'')
-    .replace(/ +/g,'-');
-}
 
 let mediaFiles = [];
 
@@ -105,7 +100,7 @@ mediaInput.addEventListener("change", function(){
 
       const mediaData = {
         url: e.target.result,
-        type: file.type.startsWith("image") ? "image" : "video"
+        type: file.type
       };
 
       mediaFiles.push(mediaData);
@@ -128,11 +123,16 @@ document.getElementById("formArtikel")
 
   e.preventDefault();
 
-  const slug = slugify(title.value);
+  if(mediaFiles.length === 0){
+    alert("Silakan pilih minimal 1 foto atau video");
+    return;
+  }
+
+  let articles = getAllArticles();
 
   const newArticle = {
+    id: Date.now().toString(),
     title: title.value,
-    slug: slug,
     author: author.value,
     date: date.value,
     category: category.value,
@@ -140,13 +140,16 @@ document.getElementById("formArtikel")
     content: "<p>"+content.value.replace(/\n/g,"</p><p>")+"</p>"
   };
 
-  // TAMPILKAN HASIL JSON UNTUK DI COPY KE artikel-data.js
-  alert("Copy data artikel ini dan tempel di artikel-data.js");
+  articles.push(newArticle);
+  saveArticles(articles);
 
-  console.log(newArticle);
-  console.log(JSON.stringify(newArticle, null, 2));
+  alert("Artikel berhasil dipublikasikan!");
+
+  // Langsung kembali ke index
+  window.location.href = "index.html";
 
 });
+
 </script>
 
 </body>
