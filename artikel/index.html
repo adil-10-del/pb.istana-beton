@@ -146,10 +146,20 @@ if(articles.length > 1){
 // ==========================
 function render(data){
   articleList.innerHTML="";
+
   data.forEach(a=>{
+
+    let mediaPreview = "";
+
+    if(a.mediaType && a.mediaType.startsWith("video")){
+      mediaPreview = `<video src="${a.media}" muted></video>`;
+    }else{
+      mediaPreview = `<img src="${a.media || '../assets/images/profil-jendela-1.jpeg'}">`;
+    }
+
     articleList.innerHTML+=`
       <div class="article-card">
-        <img src="${a.thumbnail || '../assets/images/profil-jendela-1.jpeg'}">
+        ${mediaPreview}
         <div class="article-content">
           <h3>${a.title}</h3>
           <div class="meta">
@@ -163,8 +173,6 @@ function render(data){
     `;
   });
 }
-
-render(articles);
 
 // ==========================
 // SEARCH
