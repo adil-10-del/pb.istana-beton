@@ -1,9 +1,4 @@
-const defaultArticles = [
-  {
-    ],
-    content: "<p>Ini adalah artikel pertama percobaan.</p>"
-  }
-];
+const defaultArticles = [];
 
 function getAllArticles(){
   let saved = localStorage.getItem("articles");
@@ -15,4 +10,5 @@ function getAllArticles(){
     return defaultArticles;
   }
 }
+
 
