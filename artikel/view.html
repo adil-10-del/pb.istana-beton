@@ -3,68 +3,43 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Detail Artikel | PB. Istana Beton</title>
+
 <link rel="stylesheet" href="../css/style.css">
+
+<!-- Open Graph Default -->
+<meta property="og:type" content="article">
+<meta property="og:title" content="">
+<meta property="og:description" content="">
+<meta property="og:image" content="">
+<meta property="og:url" content="">
 
 <style>
 
 /* ================= HEADER ================= */
-
-.header{
-  background:#111;
-  padding:15px 0;
-}
-
-.header-flex{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
-
-.logo{
-  height:50px;
-}
-
-.header nav a{
-  color:#fff;
-  text-decoration:none;
-  margin-left:25px;
-  font-size:14px;
-  transition:.3s;
-}
-
-.header nav a:hover,
-.header nav a.active{
-  color:#f0a500;
-}
+.header{background:#111;padding:15px 0;}
+.header-flex{display:flex;justify-content:space-between;align-items:center;}
+.logo{height:50px;}
+.header nav a{color:#fff;text-decoration:none;margin-left:25px;font-size:14px;}
+.header nav a:hover,.header nav a.active{color:#f0a500;}
 
 /* ================= HERO ================= */
+.page-hero{padding:50px 20px;text-align:center;background:#111;color:#fff;}
 
-.page-hero{
-  padding:60px 20px;
-  text-align:center;
-  background:#111;
-  color:#fff;
-}
+/* ================= CONTAINER ================= */
+.container{max-width:900px;margin:auto;padding:40px 20px;}
 
-/* ================= CONTENT ================= */
-
-.container{
-  max-width:900px;
-  margin:auto;
-  padding:40px 20px;
-}
-
-.article-detail h1{
-  margin-bottom:15px;
-  font-size:28px;
-}
-
-.meta{
+.breadcrumb{
   font-size:14px;
+  margin-bottom:20px;
   color:#777;
-  margin-bottom:25px;
 }
+.breadcrumb a{color:#111;text-decoration:none;}
+.breadcrumb a:hover{color:#f0a500;}
+
+.article-detail h1{margin-bottom:15px;font-size:28px;}
+.meta{font-size:14px;color:#777;margin-bottom:25px;}
 
 .article-detail img,
 .article-detail video{
@@ -73,10 +48,47 @@
   margin:20px 0;
 }
 
-.article-detail p{
-  line-height:1.7;
-  margin-bottom:18px;
-  color:#333;
+.article-detail p{line-height:1.7;margin-bottom:18px;color:#333;}
+
+.cta-wa{
+  display:block;
+  background:#25D366;
+  color:#fff;
+  text-align:center;
+  padding:14px;
+  border-radius:8px;
+  margin:30px 0;
+  text-decoration:none;
+  font-weight:bold;
+}
+
+.share-box{
+  margin:30px 0;
+}
+
+.share-box a{
+  display:inline-block;
+  margin:5px;
+  padding:8px 12px;
+  background:#eee;
+  border-radius:6px;
+  text-decoration:none;
+  font-size:13px;
+}
+
+.related{
+  margin-top:50px;
+}
+
+.related-item{
+  padding:15px;
+  border-bottom:1px solid #eee;
+}
+
+.related-item a{
+  text-decoration:none;
+  color:#111;
+  font-weight:bold;
 }
 
 .back-btn{
@@ -90,7 +102,6 @@
 }
 
 /* ================= WA STICKY ================= */
-
 .wa-sticky{
   position:fixed;
   bottom:20px;
@@ -103,35 +114,15 @@
   font-weight:bold;
   box-shadow:0 6px 15px rgba(0,0,0,0.2);
   z-index:999;
-  transition:.3s;
-}
-
-.wa-sticky:hover{
-  transform:scale(1.05);
-}
-
-/* ================= RESPONSIVE ================= */
-
-@media(max-width:768px){
-  .header-flex{
-    flex-direction:column;
-    gap:15px;
-  }
-
-  .header nav a{
-    margin-left:15px;
-  }
 }
 
 </style>
 </head>
 <body>
 
-<!-- ================= HEADER ================= -->
-
 <header class="header">
   <div class="container header-flex">
-    <img src="../assets/logo.jpg" class="logo" alt="PB. Istana Beton">
+    <img src="../assets/logo.jpg" class="logo">
     <nav>
       <a href="../index.html">Beranda</a>
       <a href="../produk/index.html">Produk</a>
@@ -142,75 +133,144 @@
   </div>
 </header>
 
-<!-- ================= HERO ================= -->
-
 <section class="page-hero">
   <h2>Detail Artikel</h2>
 </section>
 
-<!-- ================= CONTENT ================= -->
-
 <div class="container">
+  <div class="breadcrumb" id="breadcrumb"></div>
   <div class="article-detail" id="articleDetail"></div>
+  <div class="related" id="relatedArticles"></div>
 </div>
 
-<!-- ================= WA STICKY ================= -->
-
-<a href="https://wa.me/6283862786829"
-   target="_blank"
-   class="wa-sticky">
-   💬 WhatsApp
+<a href="https://wa.me/6283862786829" target="_blank" class="wa-sticky">
+💬 WhatsApp
 </a>
-
-<!-- ================= SCRIPT ================= -->
 
 <script src="artikel-data.js"></script>
 <script>
 
-const params = new URLSearchParams(window.location.search);
-const id = params.get("id");
+// ================= SLUG FUNCTION =================
+function slugify(text){
+  return text.toLowerCase()
+    .replace(/[^\w ]+/g,'')
+    .replace(/ +/g,'-');
+}
 
-const article = articles.find(a => a.id === id);
+// ================= GET SLUG =================
+const slug = window.location.pathname.split("/").pop().replace(".html","");
+const article = articles.find(a => slugify(a.title) === slug);
+
 const container = document.getElementById("articleDetail");
+const relatedBox = document.getElementById("relatedArticles");
+const breadcrumb = document.getElementById("breadcrumb");
 
 if(!article){
   container.innerHTML = "<h2>Artikel tidak ditemukan</h2>";
 }else{
 
-  let mediaHTML = "";
+  // ====== VIEW COUNTER ======
+  article.views = article.views ? article.views + 1 : 1;
 
-  if(article.media && article.media.length){
-    article.media.forEach(m => {
-      if(m.type === "video"){
-        mediaHTML += `
-          <video src="${m.url}" controls></video>
-        `;
+  // ====== BREADCRUMB ======
+  breadcrumb.innerHTML = `
+  <a href="../index.html">Beranda</a> › 
+  <a href="index.html">Artikel</a> › 
+  ${article.title}
+  `;
+
+  // ====== MEDIA ======
+  let mediaHTML = "";
+  if(article.media){
+    article.media.forEach(m=>{
+      if(m.type==="video"){
+        mediaHTML += `<video src="${m.url}" controls></video>`;
       }else{
-        mediaHTML += `
-          <img src="${m.url}" alt="${article.title}">
-        `;
+        mediaHTML += `<img src="${m.url}" alt="${article.title}">`;
       }
     });
   }
 
+  // ====== CTA WA MESSAGE ======
+  const waMsg = encodeURIComponent(
+    "Halo PB Istana Beton, saya tertarik dengan produk Anda setelah membaca artikel: "+article.title
+  );
+
+  // ====== SHARE URL ======
+  const currentURL = window.location.href;
+  const encodedURL = encodeURIComponent(currentURL);
+  const encodedTitle = encodeURIComponent(article.title);
+
   container.innerHTML = `
     <h1>${article.title}</h1>
     <div class="meta">
-      ${article.author} • ${article.date} • ${article.category}
+      ${article.author} • ${article.date} • ${article.category} • Dilihat ${article.views}x
     </div>
+
     ${mediaHTML}
+
     <div>${article.content}</div>
+
+    <a href="https://wa.me/6283862786829?text=${waMsg}" target="_blank" class="cta-wa">
+    🔥 Konsultasi Gratis via WhatsApp
+    </a>
+
+    <div class="share-box">
+      <strong>Bagikan:</strong><br>
+      <a href="https://wa.me/?text=${encodedTitle}%20${encodedURL}" target="_blank">WhatsApp</a>
+      <a href="https://www.facebook.com/sharer/sharer.php?u=${encodedURL}" target="_blank">Facebook</a>
+      <a href="https://t.me/share/url?url=${encodedURL}&text=${encodedTitle}" target="_blank">Telegram</a>
+      <a href="https://twitter.com/intent/tweet?url=${encodedURL}&text=${encodedTitle}" target="_blank">Twitter</a>
+      <a href="https://www.linkedin.com/sharing/share-offsite/?url=${encodedURL}" target="_blank">LinkedIn</a>
+    </div>
+
     <a href="index.html" class="back-btn">← Kembali ke Artikel</a>
   `;
+
+  // ====== RELATED ARTICLES ======
+  const related = articles
+    .filter(a => a.category === article.category && a.title !== article.title)
+    .slice(0,3);
+
+  if(related.length){
+    let relHTML = "<h3>Artikel Terkait</h3>";
+    related.forEach(r=>{
+      relHTML += `
+      <div class="related-item">
+        <a href="${slugify(r.title)}.html">${r.title}</a>
+      </div>
+      `;
+    });
+    relatedBox.innerHTML = relHTML;
+  }
+
+  // ====== OPEN GRAPH DINAMIS ======
+  document.querySelector("meta[property='og:title']").content = article.title;
+  document.querySelector("meta[property='og:description']").content = article.content.substring(0,150);
+  document.querySelector("meta[property='og:image']").content = article.media?.[0]?.url || "";
+  document.querySelector("meta[property='og:url']").content = currentURL;
+
+  // ====== SCHEMA JSON LD ======
+  const schema = {
+    "@context":"https://schema.org",
+    "@type":"Article",
+    "headline":article.title,
+    "author":{"@type":"Person","name":article.author},
+    "datePublished":article.date,
+    "image":article.media?.[0]?.url || "",
+    "publisher":{
+      "@type":"Organization",
+      "name":"PB. Istana Beton"
+    }
+  };
+
+  const script = document.createElement("script");
+  script.type="application/ld+json";
+  script.text = JSON.stringify(schema);
+  document.head.appendChild(script);
 }
 
 </script>
 
 </body>
 </html>
-
-
-
-
-
-
