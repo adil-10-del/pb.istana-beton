@@ -6,24 +6,76 @@
 <title>Tulis Artikel</title>
 
 <style>
-body{font-family:Arial;margin:0;background:#f5f5f5;}
-.container{max-width:700px;margin:auto;padding:40px 20px;}
-form{display:flex;flex-direction:column;gap:15px;}
-input,textarea,select{padding:12px;border-radius:8px;border:1px solid #ccc;}
+body{margin:0;font-family:Arial;background:#f4f4f4;}
+
+nav{
+background:#111;
+padding:15px 30px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+nav a{
+color:#fff;
+text-decoration:none;
+margin-left:20px;
+font-size:14px;
+}
+
+.container{
+max-width:700px;
+margin:auto;
+padding:40px 20px;
+}
+
+form{
+display:flex;
+flex-direction:column;
+gap:15px;
+}
+
+input,textarea,select{
+padding:12px;
+border-radius:8px;
+border:1px solid #ccc;
+}
+
 textarea{min-height:200px;}
-button{padding:12px;background:#111;color:#fff;border:none;border-radius:8px;cursor:pointer;}
-.preview img,.preview video{width:100%;margin-top:10px;border-radius:10px;}
+
+button{
+padding:12px;
+background:#111;
+color:#fff;
+border:none;
+border-radius:8px;
+cursor:pointer;
+}
+
+.preview img,.preview video{
+width:100%;
+margin-top:10px;
+border-radius:10px;
+}
 </style>
 </head>
 <body>
 
+<nav>
+<div style="color:#fff;font-weight:bold;">PB. Istana Beton</div>
+<div>
+<a href="../index.html">Beranda</a>
+<a href="../produk/index.html">Produk</a>
+<a href="index.html">Artikel</a>
+</div>
+</nav>
+
 <div class="container">
 <h1>Tulis Artikel</h1>
-<a href="index.html">← Kembali</a>
 
 <form id="formArtikel">
 <input type="text" id="title" placeholder="Judul Artikel" required>
-<input type="text" id="author" placeholder="Penulis" required>
+<input type="text" id="author" placeholder="Nama Penulis" required>
 <input type="date" id="date" required>
 
 <select id="category" required>
@@ -33,7 +85,7 @@ button{padding:12px;background:#111;color:#fff;border:none;border-radius:8px;cur
 <option>Inspirasi Desain</option>
 </select>
 
-<input type="file" id="media" accept="image/*,video/*" multiple required>
+<input type="file" id="media" accept="image/*,video/*" required>
 
 <div class="preview" id="preview"></div>
 
@@ -46,38 +98,30 @@ button{padding:12px;background:#111;color:#fff;border:none;border-radius:8px;cur
 <script src="artikel-data.js"></script>
 <script>
 
-let mediaFiles = [];
-const mediaInput = document.getElementById("media");
-const preview = document.getElementById("preview");
+let mediaBase64="";
+let mediaType="";
 
-mediaInput.addEventListener("change", function(){
+const mediaInput=document.getElementById("media");
+const preview=document.getElementById("preview");
 
-  const files = Array.from(this.files);
-  preview.innerHTML="";
-  mediaFiles=[];
+mediaInput.addEventListener("change",function(){
+const file=this.files[0];
+if(!file)return;
 
-  files.forEach(file=>{
+const reader=new FileReader();
 
-    const reader = new FileReader();
+reader.onload=function(e){
+mediaBase64=e.target.result;
+mediaType=file.type;
 
-    reader.onload=function(e){
+if(mediaType.startsWith("image")){
+preview.innerHTML=`<img src="${mediaBase64}">`;
+}else{
+preview.innerHTML=`<video src="${mediaBase64}" controls></video>`;
+}
+};
 
-      mediaFiles.push({
-        url:e.target.result,
-        type:file.type
-      });
-
-      if(file.type.startsWith("image")){
-        preview.innerHTML+=`<img src="${e.target.result}">`;
-      }else{
-        preview.innerHTML+=`<video src="${e.target.result}" controls></video>`;
-      }
-    };
-
-    reader.readAsDataURL(file);
-
-  });
-
+reader.readAsDataURL(file);
 });
 
 document.getElementById("formArtikel")
@@ -85,19 +129,15 @@ document.getElementById("formArtikel")
 
 e.preventDefault();
 
-if(mediaFiles.length===0){
-  alert("Pilih minimal 1 media");
-  return;
-}
-
 const newArticle={
-  id:Date.now().toString(),
-  title:title.value,
-  author:author.value,
-  date:date.value,
-  category:category.value,
-  media:mediaFiles,
-  content:"<p>"+content.value.replace(/\n/g,"</p><p>")+"</p>"
+id:Date.now().toString(),
+title:title.value,
+author:author.value,
+date:date.value,
+category:category.value,
+media:mediaBase64,
+mediaType:mediaType,
+content:"<p>"+content.value.replace(/\n/g,"</p><p>")+"</p>"
 };
 
 let local=JSON.parse(localStorage.getItem("articles"))||[];
@@ -108,11 +148,11 @@ alert("Artikel berhasil dipublikasikan!");
 window.location.href="index.html";
 
 });
-
 </script>
 
 </body>
 </html>
+
 
 
 
