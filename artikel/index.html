@@ -204,7 +204,10 @@
 const articleList = document.getElementById("articleList");
 const searchInput = document.getElementById("searchInput");
 
-// SORT TERBARU DI ATAS
+// Ambil dari localStorage
+let articles = getAllArticles();
+
+// Urutkan terbaru di atas
 articles.sort((a,b)=> new Date(b.date) - new Date(a.date));
 
 function render(data){
@@ -222,13 +225,11 @@ function render(data){
     let mediaPreview = "";
 
     if(firstMedia){
-      if(firstMedia.type === "video"){
+      if(firstMedia.type.startsWith("video")){
         mediaPreview = `<video src="${firstMedia.url}" muted></video>`;
       }else{
         mediaPreview = `<img src="${firstMedia.url}" alt="${a.title}">`;
       }
-    }else{
-      mediaPreview = `<img src="../assets/images/default.jpg" alt="Default">`;
     }
 
     articleList.innerHTML += `
@@ -239,7 +240,7 @@ function render(data){
           <div class="meta">
             ${a.author} • ${a.date} • ${a.category}
           </div>
-          <a href="${a.slug}.html" class="read-btn">
+          <a href="view.html?id=${a.id}" class="read-btn">
             Baca Artikel
           </a>
         </div>
@@ -249,10 +250,12 @@ function render(data){
 
 }
 
+// Render pertama kali
 render(articles);
 
-// SEARCH
+// Search
 searchInput.addEventListener("keyup", function(){
+
   const keyword = this.value.toLowerCase();
 
   const filtered = articles.filter(a =>
@@ -261,6 +264,7 @@ searchInput.addEventListener("keyup", function(){
   );
 
   render(filtered);
+
 });
 
 </script>
