@@ -53,17 +53,26 @@ const article = articles.find(a=>a.id===id);
 const container = document.getElementById("articleDetail");
 
 if(article){
+
+  let mediaHTML = "";
+
+  if(article.mediaType && article.mediaType.startsWith("video")){
+    mediaHTML = `<video src="${article.media}" controls style="width:100%; border-radius:10px; margin:20px 0;"></video>`;
+  }else if(article.media){
+    mediaHTML = `<img src="${article.media}" style="width:100%; border-radius:10px; margin:20px 0;">`;
+  }else{
+    mediaHTML = `<img src="../assets/images/profil-jendela-1.jpeg">`;
+  }
+
   container.innerHTML=`
     <h1>${article.title}</h1>
     <div class="meta">
       ${article.author} • ${article.date} • ${article.category}
     </div>
-    <img src="${article.thumbnail || '../assets/images/profil-jendela-1.jpeg'}">
+    ${mediaHTML}
     <div>${article.content}</div>
     <a href="index.html" class="back">← Kembali ke Artikel</a>
   `;
-}else{
-  container.innerHTML="<h2>Artikel tidak ditemukan</h2>";
 }
 
 </script>
