@@ -3,43 +3,166 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Detail Artikel</title>
+<title>Detail Artikel | PB. Istana Beton</title>
 <link rel="stylesheet" href="../css/style.css">
 
 <style>
 
+/* ================= HEADER ================= */
+
+.header{
+  background:#111;
+  padding:15px 0;
+}
+
+.header-flex{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.logo{
+  height:50px;
+}
+
+.header nav a{
+  color:#fff;
+  text-decoration:none;
+  margin-left:25px;
+  font-size:14px;
+  transition:.3s;
+}
+
+.header nav a:hover,
+.header nav a.active{
+  color:#f0a500;
+}
+
+/* ================= HERO ================= */
+
+.page-hero{
+  padding:60px 20px;
+  text-align:center;
+  background:#111;
+  color:#fff;
+}
+
+/* ================= CONTENT ================= */
+
 .container{
-  max-width:800px;
+  max-width:900px;
   margin:auto;
   padding:40px 20px;
 }
 
+.article-detail h1{
+  margin-bottom:15px;
+  font-size:28px;
+}
+
 .meta{
+  font-size:14px;
   color:#777;
-  margin-bottom:20px;
+  margin-bottom:25px;
 }
 
-img{
+.article-detail img,
+.article-detail video{
   width:100%;
-  margin:20px 0;
   border-radius:10px;
+  margin:20px 0;
 }
 
-.back{
+.article-detail p{
+  line-height:1.7;
+  margin-bottom:18px;
+  color:#333;
+}
+
+.back-btn{
   display:inline-block;
   margin-top:30px;
-  padding:10px 15px;
+  padding:10px 18px;
   background:#111;
   color:#fff;
   text-decoration:none;
-  border-radius:6px;
+  border-radius:8px;
+}
+
+/* ================= WA STICKY ================= */
+
+.wa-sticky{
+  position:fixed;
+  bottom:20px;
+  right:20px;
+  background:#25D366;
+  color:#fff;
+  padding:12px 18px;
+  border-radius:50px;
+  text-decoration:none;
+  font-weight:bold;
+  box-shadow:0 6px 15px rgba(0,0,0,0.2);
+  z-index:999;
+  transition:.3s;
+}
+
+.wa-sticky:hover{
+  transform:scale(1.05);
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media(max-width:768px){
+  .header-flex{
+    flex-direction:column;
+    gap:15px;
+  }
+
+  .header nav a{
+    margin-left:15px;
+  }
 }
 
 </style>
 </head>
 <body>
 
-<div class="container" id="articleDetail"></div>
+<!-- ================= HEADER ================= -->
+
+<header class="header">
+  <div class="container header-flex">
+    <img src="../assets/logo.jpg" class="logo" alt="PB. Istana Beton">
+    <nav>
+      <a href="../index.html">Beranda</a>
+      <a href="../produk/index.html">Produk</a>
+      <a href="index.html" class="active">Artikel</a>
+      <a href="../kontak.html">Kontak</a>
+      <a href="../tentang-kami.html">Tentang Kami</a>
+    </nav>
+  </div>
+</header>
+
+<!-- ================= HERO ================= -->
+
+<section class="page-hero">
+  <h2>Detail Artikel</h2>
+</section>
+
+<!-- ================= CONTENT ================= -->
+
+<div class="container">
+  <div class="article-detail" id="articleDetail"></div>
+</div>
+
+<!-- ================= WA STICKY ================= -->
+
+<a href="https://wa.me/6283862786829"
+   target="_blank"
+   class="wa-sticky">
+   💬 WhatsApp
+</a>
+
+<!-- ================= SCRIPT ================= -->
 
 <script src="artikel-data.js"></script>
 <script>
@@ -47,9 +170,7 @@ img{
 const params = new URLSearchParams(window.location.search);
 const id = params.get("id");
 
-const articles = getAllArticles();
 const article = articles.find(a => a.id === id);
-
 const container = document.getElementById("articleDetail");
 
 if(!article){
@@ -60,28 +181,26 @@ if(!article){
 
   if(article.media && article.media.length){
     article.media.forEach(m => {
-      if(m.type.startsWith("video")){
+      if(m.type === "video"){
         mediaHTML += `
-          <video src="${m.url}" controls 
-          style="width:100%;margin:20px 0;border-radius:10px;">
-          </video>`;
+          <video src="${m.url}" controls></video>
+        `;
       }else{
         mediaHTML += `
-          <img src="${m.url}" 
-          style="width:100%;margin:20px 0;border-radius:10px;">
+          <img src="${m.url}" alt="${article.title}">
         `;
       }
     });
   }
 
-  container.innerHTML=`
+  container.innerHTML = `
     <h1>${article.title}</h1>
     <div class="meta">
       ${article.author} • ${article.date} • ${article.category}
     </div>
     ${mediaHTML}
     <div>${article.content}</div>
-    <a href="index.html" class="back">← Kembali ke Artikel</a>
+    <a href="index.html" class="back-btn">← Kembali ke Artikel</a>
   `;
 }
 
@@ -89,6 +208,7 @@ if(!article){
 
 </body>
 </html>
+
 
 
 
