@@ -56,23 +56,21 @@ if(article){
 
   let mediaHTML = "";
 
-  if(article.mediaType && article.mediaType.startsWith("video")){
-    mediaHTML = `<video src="${article.media}" controls style="width:100%; border-radius:10px; margin:20px 0;"></video>`;
-  }else if(article.media){
-    mediaHTML = `<img src="${article.media}" style="width:100%; border-radius:10px; margin:20px 0;">`;
-  }else{
-    mediaHTML = `<img src="../assets/images/profil-jendela-1.jpeg">`;
-  }
+if(article.mediaType && article.mediaType.startsWith("video")){
+  mediaHTML = `<video src="${article.media}" controls></video>`;
+}else{
+  mediaHTML = `<img src="${article.media}">`;
+}
 
   container.innerHTML=`
-    <h1>${article.title}</h1>
-    <div class="meta">
-      ${article.author} • ${article.date} • ${article.category}
-    </div>
-    ${mediaHTML}
-    <div>${article.content}</div>
-    <a href="index.html" class="back">← Kembali ke Artikel</a>
-  `;
+  <h1>${article.title}</h1>
+  <div class="meta">
+    ${article.author} • ${article.date} • ${article.category}
+  </div>
+  ${mediaHTML}
+  <div>${article.content}</div>
+  <a href="index.html" class="back">← Kembali ke Artikel</a>
+`;
 }
 
 </script>
