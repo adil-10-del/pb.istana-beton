@@ -47,24 +47,25 @@ img{
 const params = new URLSearchParams(window.location.search);
 const id = params.get("id");
 
-let articles = getAllArticles();
-const article = articles.find(a=>a.id===id);
+let mediaHTML = "";
+
+if(article.mediaType && article.mediaType.startsWith("video")){
+  mediaHTML = `<video src="${article.media}" controls></video>`;
+}else{
+  mediaHTML = `<img src="${article.media}">`;
+}
 
 const container = document.getElementById("articleDetail");
 
-if(article){
-  container.innerHTML=`
-    <h1>${article.title}</h1>
-    <div class="meta">
-      ${article.author} • ${article.date} • ${article.category}
-    </div>
-    <img src="${article.thumbnail || '../assets/images/profil-jendela-1.jpeg'}">
-    <div>${article.content}</div>
-    <a href="index.html" class="back">← Kembali ke Artikel</a>
-  `;
-}else{
-  container.innerHTML="<h2>Artikel tidak ditemukan</h2>";
-}
+container.innerHTML=`
+  <h1>${article.title}</h1>
+  <div class="meta">
+    ${article.author} • ${article.date} • ${article.category}
+  </div>
+  ${mediaHTML}
+  <div>${article.content}</div>
+  <a href="index.html" class="back">← Kembali ke Artikel</a>
+`;
 
 </script>
 
