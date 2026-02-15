@@ -47,29 +47,43 @@ img{
 const params = new URLSearchParams(window.location.search);
 const id = params.get("id");
 
-let mediaHTML = "";
-
-if(article.media && article.media.length){
-  article.media.forEach(m => {
-    if(m.type.startsWith("video")){
-      mediaHTML += `<video src="${m.url}" controls style="width:100%;margin:20px 0;border-radius:10px;"></video>`;
-    }else{
-      mediaHTML += `<img src="${m.url}" style="width:100%;margin:20px 0;border-radius:10px;">`;
-    }
-  });
-}
+const articles = getAllArticles();
+const article = articles.find(a => a.id === id);
 
 const container = document.getElementById("articleDetail");
 
-container.innerHTML=`
-  <h1>${article.title}</h1>
-  <div class="meta">
-    ${article.author} • ${article.date} • ${article.category}
-  </div>
-  ${mediaHTML}
-  <div>${article.content}</div>
-  <a href="index.html" class="back">← Kembali ke Artikel</a>
-`;
+if(!article){
+  container.innerHTML = "<h2>Artikel tidak ditemukan</h2>";
+}else{
+
+  let mediaHTML = "";
+
+  if(article.media && article.media.length){
+    article.media.forEach(m => {
+      if(m.type.startsWith("video")){
+        mediaHTML += `
+          <video src="${m.url}" controls 
+          style="width:100%;margin:20px 0;border-radius:10px;">
+          </video>`;
+      }else{
+        mediaHTML += `
+          <img src="${m.url}" 
+          style="width:100%;margin:20px 0;border-radius:10px;">
+        `;
+      }
+    });
+  }
+
+  container.innerHTML=`
+    <h1>${article.title}</h1>
+    <div class="meta">
+      ${article.author} • ${article.date} • ${article.category}
+    </div>
+    ${mediaHTML}
+    <div>${article.content}</div>
+    <a href="index.html" class="back">← Kembali ke Artikel</a>
+  `;
+}
 
 </script>
 
