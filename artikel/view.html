@@ -4,78 +4,62 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Detail Artikel</title>
-<link rel="stylesheet" href="../css/style.css">
 
 <style>
-
-.container{
-  max-width:800px;
-  margin:auto;
-  padding:40px 20px;
+body{font-family:Arial;margin:0;background:#f5f5f5;}
+.container{max-width:800px;margin:auto;padding:40px 20px;}
+.gallery img,.gallery video{
+width:100%;
+margin-bottom:15px;
+border-radius:10px;
 }
-
-.meta{
-  color:#777;
-  margin-bottom:20px;
-}
-
-img{
-  width:100%;
-  margin:20px 0;
-  border-radius:10px;
-}
-
-.back{
-  display:inline-block;
-  margin-top:30px;
-  padding:10px 15px;
-  background:#111;
-  color:#fff;
-  text-decoration:none;
-  border-radius:6px;
-}
-
+.meta{color:#777;margin-bottom:20px;}
 </style>
 </head>
 <body>
 
-<div class="container" id="articleDetail"></div>
+<div class="container">
+<a href="index.html">← Kembali</a>
+<div id="articleDetail"></div>
+</div>
 
 <script src="artikel-data.js"></script>
 <script>
 
-const params = new URLSearchParams(window.location.search);
-const id = params.get("id");
+const params=new URLSearchParams(window.location.search);
+const id=params.get("id");
+const articles=getAllArticles();
+const article=articles.find(a=>a.id===id);
 
-let articles = getAllArticles();
-const article = articles.find(a=>a.id===id);
-
-const container = document.getElementById("articleDetail");
+const container=document.getElementById("articleDetail");
 
 if(article){
 
-  let mediaHTML = "";
+let galleryHTML="";
 
-if(article.mediaType && article.mediaType.startsWith("video")){
-  mediaHTML = `<video src="${article.media}" controls></video>`;
+article.media.forEach(m=>{
+if(m.type.startsWith("video")){
+galleryHTML+=`<video src="${m.url}" controls></video>`;
 }else{
-  mediaHTML = `<img src="${article.media}">`;
+galleryHTML+=`<img src="${m.url}">`;
 }
+});
 
-  container.innerHTML=`
-  <h1>${article.title}</h1>
-  <div class="meta">
-    ${article.author} • ${article.date} • ${article.category}
-  </div>
-  ${mediaHTML}
-  <div>${article.content}</div>
-  <a href="index.html" class="back">← Kembali ke Artikel</a>
+container.innerHTML=`
+<h1>${article.title}</h1>
+<div class="meta">${article.author} • ${article.date} • ${article.category}</div>
+<div class="gallery">${galleryHTML}</div>
+<div>${article.content}</div>
 `;
+
+}else{
+container.innerHTML="<p>Artikel tidak ditemukan.</p>";
 }
 
 </script>
 
 </body>
 </html>
+
 
 
