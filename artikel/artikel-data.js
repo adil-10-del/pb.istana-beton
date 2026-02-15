@@ -1,27 +1,23 @@
-const articles = [
+// Artikel default kosong
+const defaultArticles = [];
 
-  /*
-  Contoh struktur artikel:
+// Ambil semua artikel
+function getAllArticles(){
+  let saved = localStorage.getItem("articles");
 
-  {
-    title: "Judul Artikel",
-    slug: "judul-artikel",
-    author: "Admin",
-    date: "2026-02-16",
-    category: "Tips & Tutorial",
-    media: [
-      { url: "../assets/artikel/gambar1.jpg", type: "image" },
-      { url: "../assets/artikel/video1.mp4", type: "video" }
-    ],
-    content: `
-      <p>Isi paragraf pertama...</p>
-      <p>Isi paragraf kedua...</p>
-    `
+  if(saved){
+    return JSON.parse(saved);
+  }else{
+    localStorage.setItem("articles", JSON.stringify(defaultArticles));
+    return defaultArticles;
   }
+}
 
-  */
+// Simpan artikel
+function saveArticles(data){
+  localStorage.setItem("articles", JSON.stringify(data));
+}
 
-];
 
 
 
