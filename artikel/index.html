@@ -211,6 +211,11 @@ function render(data){
 
   articleList.innerHTML = "";
 
+  if(data.length === 0){
+    articleList.innerHTML = "<p>Belum ada artikel.</p>";
+    return;
+  }
+
   data.forEach(a => {
 
     let firstMedia = a.media && a.media.length ? a.media[0] : null;
@@ -220,10 +225,10 @@ function render(data){
       if(firstMedia.type === "video"){
         mediaPreview = `<video src="${firstMedia.url}" muted></video>`;
       }else{
-        mediaPreview = `<img src="${firstMedia.url}">`;
+        mediaPreview = `<img src="${firstMedia.url}" alt="${a.title}">`;
       }
     }else{
-      mediaPreview = `<img src="../assets/images/profil-jendela-1.jpeg">`;
+      mediaPreview = `<img src="../assets/images/default.jpg" alt="Default">`;
     }
 
     articleList.innerHTML += `
@@ -234,7 +239,7 @@ function render(data){
           <div class="meta">
             ${a.author} • ${a.date} • ${a.category}
           </div>
-          <a href="view.html?id=${a.id}" class="read-btn">
+          <a href="${a.slug}.html" class="read-btn">
             Baca Artikel
           </a>
         </div>
