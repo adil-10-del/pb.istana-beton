@@ -4,93 +4,73 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Detail Artikel</title>
+<link rel="stylesheet" href="../css/style.css">
 
 <style>
-body{margin:0;font-family:Arial;background:#f4f4f4;}
-
-nav{
-background:#111;
-padding:15px 30px;
-display:flex;
-justify-content:space-between;
-align-items:center;
-}
-
-nav a{
-color:#fff;
-text-decoration:none;
-margin-left:20px;
-font-size:14px;
-}
 
 .container{
-max-width:800px;
-margin:auto;
-padding:40px 20px;
-background:#fff;
+  max-width:800px;
+  margin:auto;
+  padding:40px 20px;
 }
 
 .meta{
-color:#777;
-margin-bottom:20px;
-font-size:14px;
+  color:#777;
+  margin-bottom:20px;
 }
 
-.media img,.media video{
-width:100%;
-border-radius:10px;
-margin-bottom:20px;
+img{
+  width:100%;
+  margin:20px 0;
+  border-radius:10px;
 }
+
+.back{
+  display:inline-block;
+  margin-top:30px;
+  padding:10px 15px;
+  background:#111;
+  color:#fff;
+  text-decoration:none;
+  border-radius:6px;
+}
+
 </style>
 </head>
 <body>
 
-<nav>
-<div style="color:#fff;font-weight:bold;">PB. Istana Beton</div>
-<div>
-<a href="../index.html">Beranda</a>
-<a href="../produk/index.html">Produk</a>
-<a href="index.html">Artikel</a>
-</div>
-</nav>
-
-<div class="container">
-<div id="detail"></div>
-</div>
+<div class="container" id="articleDetail"></div>
 
 <script src="artikel-data.js"></script>
 <script>
 
-const params=new URLSearchParams(window.location.search);
-const id=params.get("id");
-const articles=getAllArticles();
-const article=articles.find(a=>a.id===id);
-const detail=document.getElementById("detail");
+const params = new URLSearchParams(window.location.search);
+const id = params.get("id");
+
+let articles = getAllArticles();
+const article = articles.find(a=>a.id===id);
+
+const container = document.getElementById("articleDetail");
 
 if(article){
-
-let mediaHTML="";
-
-if(article.mediaType.startsWith("video")){
-mediaHTML=`<video src="${article.media}" controls></video>`;
+  container.innerHTML=`
+    <h1>${article.title}</h1>
+    <div class="meta">
+      ${article.author} • ${article.date} • ${article.category}
+    </div>
+    <img src="${article.thumbnail || '../assets/images/profil-jendela-1.jpeg'}">
+    <div>${article.content}</div>
+    <a href="index.html" class="back">← Kembali ke Artikel</a>
+  `;
 }else{
-mediaHTML=`<img src="${article.media}">`;
-}
-
-detail.innerHTML=`
-<h1>${article.title}</h1>
-<div class="meta">${article.author} • ${article.date} • ${article.category}</div>
-<div class="media">${mediaHTML}</div>
-<div>${article.content}</div>
-`;
-}else{
-detail.innerHTML="<p>Artikel tidak ditemukan.</p>";
+  container.innerHTML="<h2>Artikel tidak ditemukan</h2>";
 }
 
 </script>
 
 </body>
 </html>
+
 
 
 
