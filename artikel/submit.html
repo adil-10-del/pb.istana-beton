@@ -39,6 +39,12 @@ button{
   cursor:pointer;
 }
 
+.preview img, .preview video{
+  width:100%;
+  margin-top:10px;
+  border-radius:10px;
+}
+
 </style>
 </head>
 <body>
@@ -58,20 +64,54 @@ button{
       <option>Inspirasi Desain</option>
     </select>
 
-    <input type="text" id="thumbnail" placeholder="URL Thumbnail (opsional)">
+    <!-- UPLOAD FOTO / VIDEO -->
+    <input type="file" id="media" accept="image/*,video/*" required>
+
+    <div class="preview" id="preview"></div>
+
     <textarea id="content" placeholder="Isi Artikel..." required></textarea>
 
     <button type="submit">Publikasikan</button>
   </form>
 </div>
 
-<script src="artikel-data.js"></script>
 <script>
+
+let mediaBase64 = "";
+let mediaType = "";
+
+const mediaInput = document.getElementById("media");
+const preview = document.getElementById("preview");
+
+mediaInput.addEventListener("change", function(){
+  const file = this.files[0];
+  if(!file) return;
+
+  const reader = new FileReader();
+
+  reader.onload = function(e){
+    mediaBase64 = e.target.result;
+    mediaType = file.type;
+
+    if(mediaType.startsWith("image")){
+      preview.innerHTML = `<img src="${mediaBase64}">`;
+    }else{
+      preview.innerHTML = `<video src="${mediaBase64}" controls></video>`;
+    }
+  };
+
+  reader.readAsDataURL(file);
+});
 
 document.getElementById("formArtikel")
 .addEventListener("submit", function(e){
 
   e.preventDefault();
+
+  if(!mediaBase64){
+    alert("Silakan pilih foto atau video");
+    return;
+  }
 
   const newArticle = {
     id: Date.now().toString(),
@@ -79,7 +119,8 @@ document.getElementById("formArtikel")
     author: author.value,
     date: date.value,
     category: category.value,
-    thumbnail: thumbnail.value,
+    media: mediaBase64,
+    mediaType: mediaType,
     content: "<p>"+content.value.replace(/\n/g,"</p><p>")+"</p>"
   };
 
@@ -96,3 +137,4 @@ document.getElementById("formArtikel")
 
 </body>
 </html>
+
