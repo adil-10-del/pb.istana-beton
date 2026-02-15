@@ -150,40 +150,24 @@
 <script src="artikel-data.js"></script>
 <script>
 
-// ================= SLUG FUNCTION =================
-function slugify(text){
-  return text.toLowerCase()
-    .replace(/[^\w ]+/g,'')
-    .replace(/ +/g,'-');
-}
-
-// ================= GET SLUG =================
-const slug = window.location.pathname.split("/").pop().replace(".html","");
-const article = articles.find(a => slugify(a.title) === slug);
+const params = new URLSearchParams(window.location.search);
+const id = params.get("id");
 
 const container = document.getElementById("articleDetail");
-const relatedBox = document.getElementById("relatedArticles");
-const breadcrumb = document.getElementById("breadcrumb");
+
+let articles = getAllArticles();
+
+const article = articles.find(a => a.id === id);
 
 if(!article){
   container.innerHTML = "<h2>Artikel tidak ditemukan</h2>";
 }else{
 
-  // ====== VIEW COUNTER ======
-  article.views = article.views ? article.views + 1 : 1;
-
-  // ====== BREADCRUMB ======
-  breadcrumb.innerHTML = `
-  <a href="../index.html">Beranda</a> › 
-  <a href="index.html">Artikel</a> › 
-  ${article.title}
-  `;
-
-  // ====== MEDIA ======
   let mediaHTML = "";
-  if(article.media){
-    article.media.forEach(m=>{
-      if(m.type==="video"){
+
+  if(article.media && article.media.length){
+    article.media.forEach(m => {
+      if(m.type.startsWith("video")){
         mediaHTML += `<video src="${m.url}" controls></video>`;
       }else{
         mediaHTML += `<img src="${m.url}" alt="${article.title}">`;
@@ -191,83 +175,15 @@ if(!article){
     });
   }
 
-  // ====== CTA WA MESSAGE ======
-  const waMsg = encodeURIComponent(
-    "Halo PB Istana Beton, saya tertarik dengan produk Anda setelah membaca artikel: "+article.title
-  );
-
-  // ====== SHARE URL ======
-  const currentURL = window.location.href;
-  const encodedURL = encodeURIComponent(currentURL);
-  const encodedTitle = encodeURIComponent(article.title);
-
   container.innerHTML = `
     <h1>${article.title}</h1>
     <div class="meta">
-      ${article.author} • ${article.date} • ${article.category} • Dilihat ${article.views}x
+      ${article.author} • ${article.date} • ${article.category}
     </div>
-
     ${mediaHTML}
-
     <div>${article.content}</div>
-
-    <a href="https://wa.me/6283862786829?text=${waMsg}" target="_blank" class="cta-wa">
-    🔥 Konsultasi Gratis via WhatsApp
-    </a>
-
-    <div class="share-box">
-      <strong>Bagikan:</strong><br>
-      <a href="https://wa.me/?text=${encodedTitle}%20${encodedURL}" target="_blank">WhatsApp</a>
-      <a href="https://www.facebook.com/sharer/sharer.php?u=${encodedURL}" target="_blank">Facebook</a>
-      <a href="https://t.me/share/url?url=${encodedURL}&text=${encodedTitle}" target="_blank">Telegram</a>
-      <a href="https://twitter.com/intent/tweet?url=${encodedURL}&text=${encodedTitle}" target="_blank">Twitter</a>
-      <a href="https://www.linkedin.com/sharing/share-offsite/?url=${encodedURL}" target="_blank">LinkedIn</a>
-    </div>
-
     <a href="index.html" class="back-btn">← Kembali ke Artikel</a>
   `;
-
-  // ====== RELATED ARTICLES ======
-  const related = articles
-    .filter(a => a.category === article.category && a.title !== article.title)
-    .slice(0,3);
-
-  if(related.length){
-    let relHTML = "<h3>Artikel Terkait</h3>";
-    related.forEach(r=>{
-      relHTML += `
-      <div class="related-item">
-        <a href="${slugify(r.title)}.html">${r.title}</a>
-      </div>
-      `;
-    });
-    relatedBox.innerHTML = relHTML;
-  }
-
-  // ====== OPEN GRAPH DINAMIS ======
-  document.querySelector("meta[property='og:title']").content = article.title;
-  document.querySelector("meta[property='og:description']").content = article.content.substring(0,150);
-  document.querySelector("meta[property='og:image']").content = article.media?.[0]?.url || "";
-  document.querySelector("meta[property='og:url']").content = currentURL;
-
-  // ====== SCHEMA JSON LD ======
-  const schema = {
-    "@context":"https://schema.org",
-    "@type":"Article",
-    "headline":article.title,
-    "author":{"@type":"Person","name":article.author},
-    "datePublished":article.date,
-    "image":article.media?.[0]?.url || "",
-    "publisher":{
-      "@type":"Organization",
-      "name":"PB. Istana Beton"
-    }
-  };
-
-  const script = document.createElement("script");
-  script.type="application/ld+json";
-  script.text = JSON.stringify(schema);
-  document.head.appendChild(script);
 }
 
 </script>
