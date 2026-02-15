@@ -79,6 +79,12 @@ button{
 
 <script>
 
+function slugify(text){
+  return text.toLowerCase()
+    .replace(/[^\w ]+/g,'')
+    .replace(/ +/g,'-');
+}
+
 let mediaFiles = [];
 
 const mediaInput = document.getElementById("media");
@@ -99,7 +105,7 @@ mediaInput.addEventListener("change", function(){
 
       const mediaData = {
         url: e.target.result,
-        type: file.type
+        type: file.type.startsWith("image") ? "image" : "video"
       };
 
       mediaFiles.push(mediaData);
@@ -122,30 +128,25 @@ document.getElementById("formArtikel")
 
   e.preventDefault();
 
-  if(mediaFiles.length === 0){
-    alert("Silakan pilih minimal 1 foto atau video");
-    return;
-  }
+  const slug = slugify(title.value);
 
   const newArticle = {
-    id: Date.now().toString(),
     title: title.value,
+    slug: slug,
     author: author.value,
     date: date.value,
     category: category.value,
-    media: mediaFiles, // sekarang array
+    media: mediaFiles,
     content: "<p>"+content.value.replace(/\n/g,"</p><p>")+"</p>"
   };
 
-  let local = JSON.parse(localStorage.getItem("articles")) || [];
-  local.push(newArticle);
-  localStorage.setItem("articles", JSON.stringify(local));
+  // TAMPILKAN HASIL JSON UNTUK DI COPY KE artikel-data.js
+  alert("Copy data artikel ini dan tempel di artikel-data.js");
 
-  alert("Artikel berhasil dipublikasikan!");
-  window.location.href="index.html";
+  console.log(newArticle);
+  console.log(JSON.stringify(newArticle, null, 2));
 
 });
-
 </script>
 
 </body>
