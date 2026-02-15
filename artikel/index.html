@@ -125,48 +125,59 @@ let articles = getAllArticles();
 articles.sort((a,b)=> new Date(b.date) - new Date(a.date));
 
 // ==========================
-// ACAK SELAIN ARTIKEL PERTAMA
+// RENDER FUNCTION
 // ==========================
-function shuffle(arr){
-  for(let i=arr.length-1;i>0;i--){
-    const j=Math.floor(Math.random()*(i+1));
-    [arr[i],arr[j]]=[arr[j],arr[i]];
-  }
+function render(data){
+
+  articleList.innerHTML = "";
+
+  data.forEach(a => {
+
+    let firstMedia = a.media && a.media.length ? a.media[0] : null;
+    let mediaPreview = "";
+
+    if(firstMedia){
+      if(firstMedia.type.startsWith("video")){
+        mediaPreview = `<video src="${firstMedia.url}" muted></video>`;
+      }else{
+        mediaPreview = `<img src="${firstMedia.url}">`;
+      }
+    }else{
+      mediaPreview = `<img src="../assets/images/profil-jendela-1.jpeg">`;
+    }
+
+    articleList.innerHTML += `
+      <div class="article-card">
+        ${mediaPreview}
+        <div class="article-content">
+          <h3>${a.title}</h3>
+          <div class="meta">
+            ${a.author} • ${a.date} • ${a.category}
+          </div>
+          <a href="view.html?id=${a.id}" class="read-btn">
+            Baca Artikel
+          </a>
+        </div>
+      </div>
+    `;
+  });
+
 }
 
-if(articles.length > 1){
-  let first = articles[0];
-  let rest = articles.slice(1);
-  shuffle(rest);
-  articles = [first, ...rest];
-}
-
-// ==========================
-// RENDER
-// ==========================
-let firstMedia = a.media && a.media.length ? a.media[0] : null;
-
-let mediaPreview = "";
-
-if(firstMedia){
-  if(firstMedia.type.startsWith("video")){
-    mediaPreview = `<video src="${firstMedia.url}" muted></video>`;
-  }else{
-    mediaPreview = `<img src="${firstMedia.url}">`;
-  }
-}else{
-  mediaPreview = `<img src="../assets/images/profil-jendela-1.jpeg">`;
-}
+// render pertama
+render(articles);
 
 // ==========================
 // SEARCH
 // ==========================
 searchInput.addEventListener("keyup", function(){
   const keyword = this.value.toLowerCase();
+
   const filtered = articles.filter(a =>
     a.title.toLowerCase().includes(keyword) ||
     a.category.toLowerCase().includes(keyword)
   );
+
   render(filtered);
 });
 
