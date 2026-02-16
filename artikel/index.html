@@ -10,33 +10,125 @@
 <link rel="stylesheet" href="../css/style.css">
 
 <style>
+
+/* ================= HEADER ================= */
 .header{background:#111;padding:15px 0}
 .header-flex{display:flex;justify-content:space-between;align-items:center}
 .logo{height:50px}
 .header nav a{color:#fff;text-decoration:none;margin-left:25px;font-size:14px;transition:.3s}
 .header nav a:hover,.header nav a.active{color:#f0a500}
 
+/* ================= HERO ================= */
 .page-hero{padding:80px 20px;text-align:center;background:#111;color:#fff}
 
+/* ================= LAYOUT ================= */
 .container{max-width:1200px;margin:auto;padding:20px}
 
-.action-bar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;margin:40px 0;gap:15px}
-.search-box input{padding:12px;border-radius:8px;border:1px solid #ccc;width:300px}
-.btn{padding:10px 16px;background:#111;color:#fff;text-decoration:none;border-radius:8px}
+.action-bar{
+display:flex;
+justify-content:space-between;
+align-items:center;
+flex-wrap:wrap;
+margin:40px 0;
+gap:15px
+}
 
-.article-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:30px;margin-top:40px}
-.article-card{background:#1a1a1a;border-radius:16px;overflow:hidden;transition:.3s;box-shadow:0 8px 25px rgba(0,0,0,.15)}
+.search-box input{
+padding:12px;
+border-radius:8px;
+border:1px solid #ccc;
+width:300px;
+max-width:100%
+}
+
+.btn{
+padding:10px 16px;
+background:#111;
+color:#fff;
+text-decoration:none;
+border-radius:8px;
+transition:.3s
+}
+.btn:hover{background:#f0a500;color:#111}
+
+/* ================= GRID ================= */
+.article-grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+gap:30px;
+margin-top:40px
+}
+
+.article-card{
+background:#1a1a1a;
+border-radius:16px;
+overflow:hidden;
+transition:.3s;
+box-shadow:0 8px 25px rgba(0,0,0,.15)
+}
 .article-card:hover{transform:translateY(-8px)}
-.article-card img{width:100%;height:220px;object-fit:cover}
-.article-content{padding:22px;color:#fff}
-.article-content h3{font-size:18px;margin-bottom:10px}
-.meta{font-size:13px;color:#ccc;margin-bottom:10px}
-.snippet{font-size:14px;color:#ccc;margin-bottom:15px;line-height:1.6}
 
-.read-btn{display:inline-block;padding:10px 16px;background:#f0a500;color:#111;text-decoration:none;border-radius:8px;font-weight:bold;transition:.3s}
+.article-card img{
+width:100%;
+height:220px;
+object-fit:cover
+}
+
+.article-content{padding:22px;color:#fff}
+
+.article-content h3{
+font-size:18px;
+margin-bottom:10px
+}
+
+.meta{
+font-size:13px;
+color:#ccc;
+margin-bottom:10px
+}
+
+.snippet{
+font-size:14px;
+color:#ccc;
+margin-bottom:15px;
+line-height:1.6
+}
+
+.read-btn{
+display:inline-block;
+padding:10px 16px;
+background:#f0a500;
+color:#111;
+text-decoration:none;
+border-radius:8px;
+font-weight:bold;
+transition:.3s
+}
 .read-btn:hover{background:#fff}
 
-.wa-sticky{position:fixed;bottom:20px;right:20px;background:#25D366;color:#fff;padding:12px 18px;border-radius:50px;text-decoration:none;font-weight:bold;box-shadow:0 6px 15px rgba(0,0,0,.2);z-index:999}
+/* ================= LOADING ================= */
+.loading{
+text-align:center;
+padding:40px;
+font-size:16px;
+color:#666
+}
+
+/* ================= WA ================= */
+.wa-sticky{
+position:fixed;
+bottom:20px;
+right:20px;
+background:#25D366;
+color:#fff;
+padding:12px 18px;
+border-radius:50px;
+text-decoration:none;
+font-weight:bold;
+box-shadow:0 6px 15px rgba(0,0,0,.2);
+z-index:999
+}
+
 </style>
 </head>
 <body>
@@ -70,7 +162,9 @@
     <a href="submit.html" class="btn">+ Tulis Artikel</a>
   </div>
 
-  <div class="article-grid" id="articleList"></div>
+  <div class="article-grid" id="articleList">
+    <div class="loading">Memuat artikel...</div>
+  </div>
 
 </div>
 
@@ -78,7 +172,9 @@
 💬 WhatsApp
 </a>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+<!-- ================= SCRIPTS ================= -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="../js/supabase.js"></script>
 <script src="artikel.js"></script>
 
@@ -88,27 +184,36 @@ const searchInput = document.getElementById("searchInput");
 
 let articles = [];
 
+/* ================= LOAD ================= */
 async function loadArticles() {
-  articles = await ArtikelAPI.getAllArticles();
-  render(articles);
+  try {
+    articles = await ArtikelAPI.getAllArticles();
+    render(articles);
+  } catch (err) {
+    articleList.innerHTML = "<p>Gagal memuat artikel.</p>";
+    console.error(err);
+  }
 }
 
+/* ================= RENDER ================= */
 function render(data) {
-  articleList.innerHTML = "";
 
   if (!data.length) {
     articleList.innerHTML = "<p>Belum ada artikel.</p>";
     return;
   }
 
-  data.forEach(a => {
+  articleList.innerHTML = data.map(a => {
+
     const snippet = a.content
-      ? a.content.replace(/<[^>]*>/g, "").substring(0, 120) + "..."
+      ? a.content.replace(/<[^>]*>/g,"").substring(0,140) + "..."
       : "";
 
-    articleList.innerHTML += `
+    return `
       <div class="article-card">
-        ${a.thumbnail ? `<img src="${a.thumbnail}" loading="lazy">` : ""}
+        ${a.thumbnail ? 
+        `<img src="${a.thumbnail}" loading="lazy" alt="${a.title}">` 
+        : ""}
 
         <div class="article-content">
           <h3>${a.title}</h3>
@@ -121,28 +226,33 @@ function render(data) {
 
           <div class="snippet">${snippet}</div>
 
-          <a href="view.html?id=${a.id}" class="read-btn">
+          <a href="/artikel/${a.slug}.html" class="read-btn">
             Baca Artikel
           </a>
         </div>
       </div>
     `;
-  });
+
+  }).join("");
 }
 
-// SEARCH
+/* ================= SEARCH ================= */
 searchInput.addEventListener("keyup", function () {
+
   const keyword = this.value.toLowerCase();
 
   const filtered = articles.filter(a =>
-    a.title.toLowerCase().includes(keyword)
+    a.title.toLowerCase().includes(keyword) ||
+    (a.category && a.category.toLowerCase().includes(keyword))
   );
 
   render(filtered);
 });
 
 loadArticles();
+
 </script>
 
 </body>
 </html>
+
