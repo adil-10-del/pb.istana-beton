@@ -1,23 +1,29 @@
-// Artikel default kosong
-const defaultArticles = [];
+import { supabase } from '../js/supabase.js'
 
-// Ambil semua artikel
-function getAllArticles(){
-  let saved = localStorage.getItem("articles");
+// Ambil semua artikel dari database
+export async function getAllArticles() {
 
-  if(saved){
-    return JSON.parse(saved);
-  }else{
-    localStorage.setItem("articles", JSON.stringify(defaultArticles));
-    return defaultArticles;
+  const { data, error } = await supabase
+    .from('artikel')
+    .select('*')
+    .order('created_at', { ascending: false })
+
+  if (error) {
+    console.error(error)
+    return []
+  }
+
+  return data
+}
+
+// Simpan artikel ke database
+export async function saveArticle(article) {
+
+  const { error } = await supabase
+    .from('artikel')
+    .insert([article])
+
+  if (error) {
+    console.error(error)
   }
 }
-
-// Simpan artikel
-function saveArticles(data){
-  localStorage.setItem("articles", JSON.stringify(data));
-}
-
-
-
-
