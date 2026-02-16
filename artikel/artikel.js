@@ -1,147 +1,132 @@
-/* ========================================
-   ARTIKEL SERVICE (GLOBAL VERSION)
-   Compatible GitHub Pages + Supabase CDN
-======================================== */
+// ===============================
+// CMS API - Artikel
+// GitHub Pages Friendly
+// ===============================
 
+const ArtikelAPI = {
 
-/* ===============================
-   AMBIL SEMUA ARTIKEL
-================================ */
-async function getAllArticles() {
-  try {
-    const { data, error } = await supabase
-      .from('artikel')
-      .select(`
-        id,
-        slug,
-        title,
-        author,
-        category,
-        thumbnail,
-        views,
-        created_at,
-        content
-      `)
-      .order('created_at', { ascending: false });
+  // ===============================
+  // GET ALL ARTICLES
+  // ===============================
+  async getAll() {
+    try {
+      const { data, error } = await supabaseClient
+        .from("artikel")
+        .select("*")
+        .order("created_at", { ascending: false });
 
-    if (error) throw error;
-    return data || [];
-  } catch (err) {
-    console.error("Error load artikel:", err);
-    return [];
+      if (error) {
+        console.error("Load artikel error:", error);
+        return [];
+      }
+
+      return data || [];
+    } catch (err) {
+      console.error("Fatal getAll:", err);
+      return [];
+    }
+  },
+
+  // ===============================
+  // GET BY SLUG (SEO)
+  // ===============================
+  async getBySlug(slug) {
+    try {
+      const { data, error } = await supabaseClient
+        .from("artikel")
+        .select("*")
+        .eq("slug", slug)
+        .single();
+
+      if (error) {
+        console.warn("Artikel tidak ditemukan:", slug);
+        return null;
+      }
+
+      return data;
+    } catch (err) {
+      console.error("Fatal getBySlug:", err);
+      return null;
+    }
+  },
+
+  // ===============================
+  // SAVE ARTICLE
+  // ===============================
+  async save(article) {
+    try {
+      const { error } = await supabaseClient
+        .from("artikel")
+        .insert([article]);
+
+      if (error) {
+        console.error("Insert error:", error);
+        return { success: false, error };
+      }
+
+      return { success: true };
+    } catch (err) {
+      console.error("Fatal save:", err);
+      return { success: false, error: err };
+    }
+  },
+
+  // ===============================
+  // UPDATE VIEWS
+  // ===============================
+  async addView(id, currentViews = 0) {
+    try {
+      await supabaseClient
+        .from("artikel")
+        .update({ views: currentViews + 1 })
+        .eq("id", id);
+    } catch (err) {
+      console.warn("View update fail:", err);
+    }
+  },
+
+  // ===============================
+  // GET RELATED ARTICLES
+  // ===============================
+  async getRelated(currentSlug, limit = 3) {
+    try {
+      const { data } = await supabaseClient
+        .from("artikel")
+        .select("slug,title")
+        .neq("slug", currentSlug)
+        .order("created_at", { ascending: false })
+        .limit(limit);
+
+      return data || [];
+    } catch (err) {
+      console.warn("Related error:", err);
+      return [];
+    }
+  },
+
+  // ===============================
+  // GENERATE SLUG
+  // ===============================
+  slugify(text) {
+    return text
+      .toLowerCase()
+      .replace(/[^\w\s-]/g, "")
+      .trim()
+      .replace(/\s+/g, "-");
+  },
+
+  // ===============================
+  // AUTO META DESCRIPTION
+  // ===============================
+  makeMetaDesc(html, length = 150) {
+    const text = html.replace(/<[^>]*>/g, "");
+    return text.substring(0, length);
   }
-}
 
-
-/* ===============================
-   SIMPAN ARTIKEL
-================================ */
-async function saveArticle(article) {
-  try {
-    const { data, error } = await supabase
-      .from('artikel')
-      .insert([article])
-      .select()
-      .single();
-
-    if (error) throw error;
-
-    return { success: true, data };
-  } catch (err) {
-    console.error("Error simpan artikel:", err);
-    return { success: false, error: err };
-  }
-}
-
-
-/* ===============================
-   AMBIL ARTIKEL BY ID
-================================ */
-async function getArticleById(id) {
-  try {
-    const { data, error } = await supabase
-      .from('artikel')
-      .select('*')
-      .eq('id', id)
-      .single();
-
-    if (error) throw error;
-    return data;
-  } catch (err) {
-    console.error("Error ambil artikel:", err);
-    return null;
-  }
-}
-
-
-/* ===============================
-   AMBIL ARTIKEL BY SLUG (SEO)
-================================ */
-async function getArticleBySlug(slug) {
-  try {
-    const { data, error } = await supabase
-      .from('artikel')
-      .select('*')
-      .eq('slug', slug)
-      .single();
-
-    if (error) throw error;
-    return data;
-  } catch (err) {
-    console.error("Error ambil artikel:", err);
-    return null;
-  }
-}
-
-
-/* ===============================
-   UPDATE VIEW COUNTER
-================================ */
-async function updateArticleViews(id, currentViews = 0) {
-  try {
-    const { error } = await supabase
-      .from('artikel')
-      .update({ views: currentViews + 1 })
-      .eq('id', id);
-
-    if (error) throw error;
-  } catch (err) {
-    console.error("Error update views:", err);
-  }
-}
-
-
-/* ===============================
-   AMBIL ARTIKEL TERKAIT
-================================ */
-async function getRelatedArticles(currentId, limit = 3) {
-  try {
-    const { data, error } = await supabase
-      .from('artikel')
-      .select('id,title,slug')
-      .neq('id', currentId)
-      .limit(limit);
-
-    if (error) throw error;
-    return data || [];
-  } catch (err) {
-    console.error("Error related artikel:", err);
-    return [];
-  }
-}
-
-
-/* ========================================
-   EXPORT GLOBAL (OPTIONAL)
-   biar bisa dipanggil window.getAllArticles()
-======================================== */
-window.ArtikelAPI = {
-  getAllArticles,
-  saveArticle,
-  getArticleById,
-  getArticleBySlug,
-  updateArticleViews,
-  getRelatedArticles
 };
+
+// expose global
+window.ArtikelAPI = ArtikelAPI;
+
 
 
