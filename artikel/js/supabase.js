@@ -1,9 +1,9 @@
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+// Pastikan CDN supabase sudah dipanggil sebelum file ini
+// https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 
-const supabaseUrl = 'https://tcuimqhiilfervvjfcey.supabase.co'
-const supabaseKey = 'sb_publishable_LINoyHDPvUvWDVB6OHBXWg_1BK_EAIu'
+const SUPABASE_URL = "https://tcuimqhiilfervvjfcey.supabase.co";
+const SUPABASE_KEY = "sb_publishable_LINoyHDPvUvWDVB6OHBXWg_1BK_EAIu";
 
-export const supabase = createClient(
-  supabaseUrl,
-  supabaseKey
-)
+// Global variable
+window.supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
