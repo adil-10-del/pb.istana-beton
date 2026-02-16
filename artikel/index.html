@@ -3,164 +3,40 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Artikel | PB. Istana Beton</title>
+<meta name="description" content="Artikel seputar beton, GRC, dan dunia konstruksi dari PB. Istana Beton.">
+
 <link rel="stylesheet" href="../css/style.css">
 
 <style>
+.header{background:#111;padding:15px 0}
+.header-flex{display:flex;justify-content:space-between;align-items:center}
+.logo{height:50px}
+.header nav a{color:#fff;text-decoration:none;margin-left:25px;font-size:14px;transition:.3s}
+.header nav a:hover,.header nav a.active{color:#f0a500}
 
-/* ================= HEADER ================= */
+.page-hero{padding:80px 20px;text-align:center;background:#111;color:#fff}
 
-.header{
-  background:#111;
-  padding:15px 0;
-}
+.container{max-width:1200px;margin:auto;padding:20px}
 
-.header-flex{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
+.action-bar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;margin:40px 0;gap:15px}
+.search-box input{padding:12px;border-radius:8px;border:1px solid #ccc;width:300px}
+.btn{padding:10px 16px;background:#111;color:#fff;text-decoration:none;border-radius:8px}
 
-.logo{
-  height:50px;
-}
+.article-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:30px;margin-top:40px}
+.article-card{background:#1a1a1a;border-radius:16px;overflow:hidden;transition:.3s;box-shadow:0 8px 25px rgba(0,0,0,.15)}
+.article-card:hover{transform:translateY(-8px)}
+.article-card img{width:100%;height:220px;object-fit:cover}
+.article-content{padding:22px;color:#fff}
+.article-content h3{font-size:18px;margin-bottom:10px}
+.meta{font-size:13px;color:#ccc;margin-bottom:10px}
+.snippet{font-size:14px;color:#ccc;margin-bottom:15px;line-height:1.6}
 
-.header nav a{
-  color:#fff;
-  text-decoration:none;
-  margin-left:25px;
-  font-size:14px;
-  transition:.3s;
-}
+.read-btn{display:inline-block;padding:10px 16px;background:#f0a500;color:#111;text-decoration:none;border-radius:8px;font-weight:bold;transition:.3s}
+.read-btn:hover{background:#fff}
 
-.header nav a:hover,
-.header nav a.active{
-  color:#f0a500;
-}
-
-/* ================= HERO ================= */
-
-.page-hero{
-  padding:80px 20px;
-  text-align:center;
-  background:#111;
-  color:#fff;
-}
-
-/* ================= LAYOUT ================= */
-
-.container{
-  max-width:1200px;
-  margin:auto;
-  padding:20px;
-}
-
-.action-bar{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  flex-wrap:wrap;
-  margin:40px 0;
-  gap:15px;
-}
-
-.search-box input{
-  padding:12px;
-  border-radius:8px;
-  border:1px solid #ccc;
-  width:300px;
-}
-
-.btn{
-  padding:10px 16px;
-  background:#111;
-  color:#fff;
-  text-decoration:none;
-  border-radius:8px;
-}
-
-/* ================= ARTICLE GRID ================= */
-
-.article-grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
-  gap:30px;
-  margin-top:40px;
-}
-
-.article-card{
-  background:#1a1a1a;
-  border-radius:16px;
-  overflow:hidden;
-  transition:0.3s ease;
-  box-shadow:0 8px 25px rgba(0,0,0,0.15);
-}
-
-.article-card:hover{
-  transform:translateY(-8px);
-}
-
-.article-card img{
-  width:100%;
-  height:220px;
-  object-fit:cover;
-}
-
-.article-content{
-  padding:22px;
-  color:#fff;
-}
-
-.article-content h3{
-  font-size:18px;
-  margin-bottom:10px;
-  color:#fff;
-}
-
-.meta{
-  font-size:13px;
-  color:#ccc;
-  margin-bottom:10px;
-}
-
-.snippet{
-  font-size:14px;
-  color:#ccc;
-  margin-bottom:15px;
-  line-height:1.6;
-}
-
-.read-btn{
-  display:inline-block;
-  padding:10px 16px;
-  background:#f0a500;
-  color:#111;
-  text-decoration:none;
-  border-radius:8px;
-  font-weight:bold;
-  transition:0.3s;
-}
-
-.read-btn:hover{
-  background:#fff;
-}
-
-/* ================= WA STICKY ================= */
-
-.wa-sticky{
-  position:fixed;
-  bottom:20px;
-  right:20px;
-  background:#25D366;
-  color:#fff;
-  padding:12px 18px;
-  border-radius:50px;
-  text-decoration:none;
-  font-weight:bold;
-  box-shadow:0 6px 15px rgba(0,0,0,0.2);
-  z-index:999;
-}
-
+.wa-sticky{position:fixed;bottom:20px;right:20px;background:#25D366;color:#fff;padding:12px 18px;border-radius:50px;text-decoration:none;font-weight:bold;box-shadow:0 6px 15px rgba(0,0,0,.2);z-index:999}
 </style>
 </head>
 <body>
@@ -185,7 +61,6 @@
   <p>Informasi seputar beton & GRC</p>
 </section>
 
-<!-- CONTENT -->
 <div class="container">
 
   <div class="action-bar">
@@ -199,42 +74,46 @@
 
 </div>
 
-<!-- WA BUTTON -->
 <a href="https://wa.me/6283862786829" target="_blank" class="wa-sticky">
 💬 WhatsApp
 </a>
 
-<script type="module">
+<!-- SUPABASE CDN -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 
-import { supabase } from "../../js/supabase.js";
+<!-- CONFIG SUPABASE KAMU -->
+<script src="../js/supabase.js"></script>
 
+<script>
 const articleList = document.getElementById("articleList");
 const searchInput = document.getElementById("searchInput");
 
 let articles = [];
 
+// LOAD ARTIKEL
 async function loadArticles(){
+  try{
+    const { data, error } = await supabase
+      .from("artikel")
+      .select("id,title,author,category,thumbnail,created_at,views,content")
+      .order("created_at", { ascending: false });
 
-  const { data, error } = await supabase
-    .from("artikel")
-    .select("id,title,author,category,thumbnail,created_at,views,content")
-    .order("created_at", { ascending: false });
+    if(error) throw error;
 
-  if(error){
-    console.error(error);
-    articleList.innerHTML = "<p>Gagal memuat artikel.</p>";
-    return;
+    articles = data || [];
+    render(articles);
+
+  }catch(err){
+    console.error(err);
+    articleList.innerHTML = "<p style='color:red'>Gagal memuat artikel.</p>";
   }
-
-  articles = data;
-  render(articles);
 }
 
+// RENDER UI
 function render(data){
-
   articleList.innerHTML = "";
 
-  if(data.length === 0){
+  if(!data.length){
     articleList.innerHTML = "<p>Belum ada artikel.</p>";
     return;
   }
@@ -242,21 +121,25 @@ function render(data){
   data.forEach(a => {
 
     const snippet = a.content
-      ? a.content.replace(/<[^>]*>/g,"").substring(0,100) + "..."
+      ? a.content.replace(/<[^>]*>/g,"").substring(0,120) + "..."
       : "";
+
+    const date = a.created_at
+      ? new Date(a.created_at).toLocaleDateString("id-ID")
+      : "-";
 
     articleList.innerHTML += `
       <div class="article-card">
-        ${a.thumbnail ? `<img src="${a.thumbnail}" alt="${a.title}">` : ""}
+        ${a.thumbnail ? `<img src="${a.thumbnail}" loading="lazy" alt="${a.title}">` : ""}
 
         <div class="article-content">
           <h3>${a.title}</h3>
 
           <div class="meta">
-            ${a.author ?? "Admin"} • 
-            ${new Date(a.created_at).toLocaleDateString("id-ID")} • 
-            ${a.category ?? "Artikel"} • 
-            👁 ${a.views ?? 0}
+            ${a.author || "Admin"} • 
+            ${date} • 
+            ${a.category || "Artikel"} • 
+            👁 ${a.views || 0}
           </div>
 
           <div class="snippet">${snippet}</div>
@@ -272,7 +155,6 @@ function render(data){
 
 // SEARCH
 searchInput.addEventListener("keyup", function(){
-
   const keyword = this.value.toLowerCase();
 
   const filtered = articles.filter(a =>
@@ -284,7 +166,6 @@ searchInput.addEventListener("keyup", function(){
 });
 
 loadArticles();
-
 </script>
 
 </body>
