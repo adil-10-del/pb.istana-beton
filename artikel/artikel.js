@@ -1,29 +1,35 @@
 import { supabase } from '../js/supabase.js'
 
-// Ambil semua artikel dari database
+// Ambil semua artikel
 export async function getAllArticles() {
 
   const { data, error } = await supabase
     .from('artikel')
     .select('*')
-    .order('created_at', { ascending: false })
+    .order('created_at', { ascending: false });
 
   if (error) {
-    console.error(error)
-    return []
+    console.error("Error load artikel:", error);
+    return [];
   }
 
-  return data
+  return data ?? [];
 }
 
-// Simpan artikel ke database
+
+// Simpan artikel
 export async function saveArticle(article) {
 
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from('artikel')
     .insert([article])
+    .select();
 
   if (error) {
-    console.error(error)
+    console.error("Error simpan artikel:", error);
+    return { success:false, error };
   }
+
+  return { success:true, data };
 }
+
