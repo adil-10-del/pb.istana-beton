@@ -75,8 +75,12 @@ button.submit{padding:14px;background:#111;color:#fff;border:none;border-radius:
 
 <!-- SCRIPT URUTAN WAJIB -->
 
-<script>
-Editor.init("editor"); // INI JUGA YANG KAMU TANYA
+<script type="module">
+import { ArtikelAPI } from "./artikel.js";
+import { supabase } from "../js/supabase.js";
+import "./editor.js";
+
+Editor.init("editor");
 
 const form = document.getElementById("formArtikel");
 const mediaInput = document.getElementById("media");
@@ -109,7 +113,6 @@ form.addEventListener("submit", async e=>{
   const author=document.getElementById("author").value.trim()||"Admin";
   const category=document.getElementById("category").value;
 
-  // INI YANG KAMU TANYA 👇
   const content = Editor.getHTML();
   const meta_desc = Editor.makeMetaDesc(Editor.getText());
   const slug = Editor.makeSlug(title);
@@ -148,7 +151,6 @@ form.addEventListener("submit", async e=>{
     if(!res.success) throw res.error;
 
     alert("Artikel berhasil 🚀");
-
     window.location.href=`/artikel/${slug}.html`;
 
   }catch(err){
@@ -157,6 +159,7 @@ form.addEventListener("submit", async e=>{
   }
 });
 </script>
+
 
 </body>
 </html>
