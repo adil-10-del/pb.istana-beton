@@ -15,7 +15,18 @@ form{display:flex;flex-direction:column;gap:15px}
 input,select{padding:12px;border-radius:8px;border:1px solid #ccc}
 .editor-toolbar{display:flex;gap:8px;flex-wrap:wrap}
 .editor-toolbar button{padding:8px 10px;border:none;background:#111;color:#fff;border-radius:6px;cursor:pointer}
-.editor{min-height:250px;border:1px solid #ccc;border-radius:8px;padding:12px;background:#fff}
+.editor{
+  min-height:250px;
+  border:1px solid #ccc;
+  border-radius:8px;
+  padding:12px;
+  background:#fff;
+  color:#111; /* TAMBAH INI */
+}
+
+.editor *{
+  color:#111;
+}
 .preview img,.preview video{width:100%;margin-top:10px;border-radius:10px}
 button.submit{padding:14px;background:#111;color:#fff;border:none;border-radius:8px;cursor:pointer}
 .back{margin-bottom:15px;display:inline-block;color:#666;text-decoration:none}
