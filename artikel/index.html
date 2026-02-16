@@ -209,19 +209,31 @@
    💬 WhatsApp
 </a>
 
-<!-- ================= SCRIPT ================= -->
+<script type="module">
 
-<script src="artikel.js"></script>
-<script>
+import { supabase } from "../js/supabase.js";
 
 const articleList = document.getElementById("articleList");
 const searchInput = document.getElementById("searchInput");
 
-// Ambil dari localStorage
-let articles = getAllArticles();
+let articles = [];
 
-// Urutkan terbaru di atas
-articles.sort((a,b)=> new Date(b.date) - new Date(a.date));
+async function loadArticles(){
+
+  const { data, error } = await supabase
+    .from("artikel")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if(error){
+    console.error(error);
+    articleList.innerHTML = "<p>Gagal memuat artikel.</p>";
+    return;
+  }
+
+  articles = data;
+  render(articles);
+}
 
 function render(data){
 
@@ -234,24 +246,21 @@ function render(data){
 
   data.forEach(a => {
 
-    let firstMedia = a.media && a.media.length ? a.media[0] : null;
     let mediaPreview = "";
 
-    if(firstMedia){
-      if(firstMedia.type.startsWith("video")){
-        mediaPreview = `<video src="${firstMedia.url}" muted></video>`;
-      }else{
-        mediaPreview = `<img src="${firstMedia.url}" alt="${a.title}">`;
-      }
+    if(a.gambar){
+      mediaPreview = `<img src="${a.gambar}" alt="${a.judul}">`;
     }
 
     articleList.innerHTML += `
       <div class="article-card">
         ${mediaPreview}
         <div class="article-content">
-          <h3>${a.title}</h3>
+          <h3>${a.judul}</h3>
           <div class="meta">
-            ${a.author} • ${a.date} • ${a.category}
+            ${a.author ?? "Admin"} • 
+            ${new Date(a.created_at).toLocaleDateString("id-ID")} • 
+            ${a.category ?? "Artikel"}
           </div>
           <a href="view.html?id=${a.id}" class="read-btn">
             Baca Artikel
@@ -263,22 +272,22 @@ function render(data){
 
 }
 
-// Render pertama kali
-render(articles);
-
 // Search
 searchInput.addEventListener("keyup", function(){
 
   const keyword = this.value.toLowerCase();
 
   const filtered = articles.filter(a =>
-    a.title.toLowerCase().includes(keyword) ||
-    a.category.toLowerCase().includes(keyword)
+    a.judul.toLowerCase().includes(keyword) ||
+    (a.category && a.category.toLowerCase().includes(keyword))
   );
 
   render(filtered);
 
 });
+
+// Jalankan saat halaman dibuka
+loadArticles();
 
 </script>
 
