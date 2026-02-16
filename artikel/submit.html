@@ -143,15 +143,15 @@ form.addEventListener("submit", async function(e){
       .getPublicUrl(fileName);
 
   // 3️⃣ Simpan ke tabel artikel
-  const { error } = await supabase
-    .from("artikel")
-    .insert([{
-      judul: title.value,
-      author: author.value,
-      category: category.value,
-      isi: "<p>"+content.value.replace(/\n/g,"</p><p>")+"</p>",
-      gambar: publicUrl.publicUrl
-    }]);
+  .insert([{
+  title: title.value,
+  author: author.value,
+  category: category.value,
+  content: "<p>"+content.value.replace(/\n/g,"</p><p>")+"</p>",
+  thumbnail: publicUrl.publicUrl,
+  media: publicUrl.publicUrl,
+  views: 0
+}])
 
   if(error){
     console.error(error);
