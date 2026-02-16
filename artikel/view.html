@@ -81,112 +81,77 @@
 <script src="artikel.js"></script>
 
 <script>
-const params = new URLSearchParams(window.location.search);
+const params = new URLSearchParams(location.search);
 const id = params.get("id");
 
 const container = document.getElementById("articleDetail");
 const breadcrumb = document.getElementById("breadcrumb");
 const relatedContainer = document.getElementById("relatedArticles");
 
-async function loadArticle(){
-
-  if(!id){
+async function loadArticle() {
+  if (!id) {
     container.innerHTML = "<h2>Artikel tidak ditemukan</h2>";
     return;
   }
 
-  try{
+  const article = await ArtikelAPI.getArticleById(id);
 
-    // GET ARTICLE
-    const { data: article, error } = await supabase
-      .from("artikel")
-      .select("*")
-      .eq("id", id)
-      .single();
+  if (!article) {
+    container.innerHTML = "<h2>Artikel tidak ditemukan</h2>";
+    return;
+  }
 
-    if(error || !article){
-      container.innerHTML = "<h2>Artikel tidak ditemukan</h2>";
-      return;
-    }
+  // UPDATE VIEWS
+  await ArtikelAPI.updateArticleViews(id, article.views);
 
-    // UPDATE VIEW
-    await supabase
-      .from("artikel")
-      .update({ views: (article.views || 0) + 1 })
-      .eq("id", article.id);
+  // BREADCRUMB
+  breadcrumb.innerHTML = `
+    <a href="../index.html">Beranda</a> /
+    <a href="index.html">Artikel</a> /
+    ${article.title}
+  `;
 
-    // BREADCRUMB
-    breadcrumb.innerHTML = `
-      <a href="../index.html">Beranda</a> /
-      <a href="index.html">Artikel</a> /
-      ${article.title}
-    `;
+  // RENDER
+  container.innerHTML = `
+    <h1>${article.title}</h1>
 
-    // RENDER
-    container.innerHTML = `
-      <h1>${article.title}</h1>
+    <div class="meta">
+      ${article.author || "Admin"} • 
+      ${new Date(article.created_at).toLocaleDateString("id-ID")} • 
+      👁 ${(article.views || 0) + 1} dilihat
+    </div>
 
-      <div class="meta">
-        ${article.author || "Admin"} • 
-        ${new Date(article.created_at).toLocaleDateString("id-ID")} • 
-        ${article.category || "Artikel"} • 
-        👁 ${(article.views || 0) + 1} dilihat
-      </div>
+    ${article.thumbnail ? `<img src="${article.thumbnail}" loading="lazy">` : ""}
 
-      ${article.thumbnail ? `<img src="${article.thumbnail}" loading="lazy">` : ""}
+    <div>${article.content}</div>
 
-      <div>${article.content}</div>
+    <a class="cta-wa"
+      target="_blank"
+      href="https://wa.me/6283862786829?text=${encodeURIComponent(
+        "Halo PB Istana Beton, saya tertarik setelah membaca artikel: " + article.title
+      )}">
+      💬 Konsultasi via WhatsApp
+    </a>
 
-      <a class="cta-wa"
-         target="_blank"
-         href="https://wa.me/6283862786829?text=${encodeURIComponent(
-           "Halo PB Istana Beton, saya tertarik setelah membaca artikel: " + article.title
-         )}">
-         💬 Konsultasi via WhatsApp
-      </a>
+    <a href="index.html" class="back-btn">← Kembali</a>
+  `;
 
-      <a href="index.html" class="back-btn">← Kembali ke Artikel</a>
-    `;
+  // SEO TITLE
+  document.title = article.title + " | PB. Istana Beton";
 
-    // SEO OPEN GRAPH
-    document.title = article.title + " | PB. Istana Beton";
+  // RELATED
+  const related = await ArtikelAPI.getRelatedArticles(id);
 
-    document.querySelector("meta[property='og:title']")
-      .setAttribute("content", article.title);
+  if (related.length) {
+    relatedContainer.innerHTML = "<h3>Artikel Lainnya</h3>";
 
-    document.querySelector("meta[property='og:description']")
-      .setAttribute("content",
-        article.content.replace(/<[^>]*>/g,"").substring(0,150)
-      );
-
-    document.querySelector("meta[property='og:image']")
-      .setAttribute("content", article.thumbnail || "");
-
-    document.querySelector("meta[property='og:url']")
-      .setAttribute("content", location.href);
-
-    // RELATED
-    const { data: related } = await supabase
-      .from("artikel")
-      .select("id,title")
-      .neq("id", id)
-      .limit(3);
-
-    if(related?.length){
-      relatedContainer.innerHTML = "<h3>Artikel Lainnya</h3>";
-
-      related.forEach(r => {
-        relatedContainer.innerHTML += `
-          <div class="related-item">
-            <a href="view.html?id=${r.id}">${r.title}</a>
-          </div>
-        `;
-      });
-    }
-
-  }catch(err){
-    console.error(err);
-    container.innerHTML = "<p>Terjadi kesalahan.</p>";
+    related.forEach(r => {
+      relatedContainer.innerHTML += `
+        <div class="related-item">
+          <a href="view.html?id=${r.id}">${r.title}</a>
+        </div>
+      `;
+    });
   }
 }
 
