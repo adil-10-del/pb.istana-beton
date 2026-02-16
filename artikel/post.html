@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Artikel | PB. Istana Beton</title>
+<title>Memuat artikel...</title>
 <meta name="description" content="Artikel PB Istana Beton">
 
 <!-- Open Graph -->
@@ -17,90 +17,140 @@
 <link rel="stylesheet" href="../css/style.css">
 
 <style>
+body{background:#0f0f0f;color:#fff;font-family:sans-serif}
 .container{max-width:900px;margin:auto;padding:40px 20px}
-.article{background:#1a1a1a;padding:30px;border-radius:16px;color:#fff}
-.meta{color:#ccc;font-size:14px;margin-bottom:20px}
-.article img{width:100%;border-radius:10px;margin:20px 0}
-.cta{display:block;margin-top:30px;background:#25D366;padding:14px;text-align:center;border-radius:8px;color:#fff;text-decoration:none;font-weight:bold}
-.back{display:inline-block;margin-top:20px;color:#ccc}
+
+.article{
+  background:#1a1a1a;
+  padding:30px;
+  border-radius:16px;
+  box-shadow:0 10px 30px rgba(0,0,0,.4)
+}
+
+.article h1{margin-bottom:15px;font-size:28px}
+
+.meta{color:#aaa;font-size:14px;margin-bottom:25px}
+
+.article img,.article video{
+  width:100%;
+  border-radius:12px;
+  margin:20px 0
+}
+
+.article p{line-height:1.8;margin-bottom:16px;color:#eee}
+
+.cta{
+  display:block;
+  margin-top:30px;
+  background:#25D366;
+  padding:14px;
+  text-align:center;
+  border-radius:8px;
+  color:#fff;
+  text-decoration:none;
+  font-weight:bold;
+  transition:.2s
+}
+.cta:hover{transform:scale(1.02)}
+
+.back{
+  display:inline-block;
+  margin-top:25px;
+  color:#bbb;
+  text-decoration:none;
+}
+.back:hover{color:#fff}
 </style>
 </head>
 <body>
 
 <div class="container">
-  <div id="article"></div>
+  <div id="article">Memuat artikel...</div>
 </div>
 
-<!-- SCRIPT URUTAN WAJIB -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="../js/supabase.js"></script>
-<script src="artikel.js"></script>
-<script src="router.js"></script>
+<!-- GLOBAL SCRIPT -->
+<script src="editor.js"></script> <!-- optional future reuse -->
 
-<script>
+<!-- MODULE SCRIPT -->
+<script type="module">
+import { ArtikelAPI } from "./artikel.js";
+import { supabase } from "../js/supabase.js";
+import { getSlug } from "./router.js";
+
+const el = document.getElementById("article");
+
 async function loadArticle(){
+  try{
+    const slug = getSlug();
 
-  const slug = getSlug();
+    if(!slug){
+      el.innerHTML = "Artikel tidak ditemukan";
+      return;
+    }
 
-  if(!slug){
-    document.getElementById("article").innerHTML="Artikel tidak ditemukan";
-    return;
-  }
+    const artikel = await ArtikelAPI.getArticleBySlug(slug);
 
-  const artikel = await ArtikelAPI.getArticleBySlug(slug);
+    if(!artikel){
+      el.innerHTML = "Artikel tidak ditemukan";
+      return;
+    }
 
-  if(!artikel){
-    document.getElementById("article").innerHTML="Artikel tidak ditemukan";
-    return;
-  }
+    /* ================= UPDATE VIEW ================= */
+    ArtikelAPI.updateArticleViews(artikel.id, artikel.views || 0);
 
-  // Update views
-  ArtikelAPI.updateArticleViews(artikel.id, artikel.views);
+    /* ================= RENDER ================= */
+    el.innerHTML = `
+      <div class="article">
+        <h1>${artikel.title}</h1>
 
-  // Render
-  document.getElementById("article").innerHTML=`
-    <div class="article">
-      <h1>${artikel.title}</h1>
+        <div class="meta">
+          ${artikel.author || "Admin"} • 
+          ${new Date(artikel.created_at).toLocaleDateString("id-ID")} • 
+          👁 ${(artikel.views || 0) + 1}
+        </div>
 
-      <div class="meta">
-        ${artikel.author || "Admin"} • 
-        ${new Date(artikel.created_at).toLocaleDateString("id-ID")} • 
-        👁 ${(artikel.views||0)+1}
+        ${artikel.thumbnail ? `<img src="${artikel.thumbnail}" loading="lazy">` : ""}
+
+        <div>${artikel.content}</div>
+
+        <a class="cta"
+           target="_blank"
+           href="https://wa.me/6283862786829?text=${encodeURIComponent(
+             "Halo PB Istana Beton, saya tertarik setelah membaca artikel: " + artikel.title
+           )}">
+           💬 Konsultasi via WhatsApp
+        </a>
+
+        <a href="/artikel/index.html" class="back">← Kembali ke artikel</a>
       </div>
+    `;
 
-      ${artikel.thumbnail ? `<img src="${artikel.thumbnail}">` : ""}
+    /* ================= SEO DINAMIS ================= */
+    const title = artikel.title + " | PB. Istana Beton";
+    const desc = artikel.meta_desc || artikel.title;
+    const image = artikel.thumbnail || "";
 
-      <div>${artikel.content}</div>
+    document.title = title;
 
-      <a class="cta"
-         target="_blank"
-         href="https://wa.me/6283862786829?text=${encodeURIComponent(
-           "Halo, saya tertarik setelah membaca artikel: "+artikel.title
-         )}">
-         💬 Konsultasi via WhatsApp
-      </a>
+    document.querySelector('meta[name="description"]')
+      .setAttribute("content", desc);
 
-      <a href="/artikel/index.html" class="back">← Kembali ke artikel</a>
-    </div>
-  `;
+    document.querySelector("meta[property='og:title']")
+      .setAttribute("content", title);
 
-  /* ================= SEO DINAMIS ================= */
-  document.title = artikel.title + " | PB. Istana Beton";
+    document.querySelector("meta[property='og:description']")
+      .setAttribute("content", desc);
 
-  document.querySelector('meta[name="description"]')
-    .setAttribute("content", artikel.meta_desc || artikel.title);
+    document.querySelector("meta[property='og:image']")
+      .setAttribute("content", image);
 
-  document.querySelector("meta[property='og:title']")
-    .setAttribute("content", artikel.title);
+    document.querySelector("meta[property='og:url']")
+      .setAttribute("content", window.location.href);
 
-  document.querySelector("meta[property='og:description']")
-    .setAttribute("content", artikel.meta_desc || artikel.title);
-
-  document.querySelector("meta[property='og:image']")
-    .setAttribute("content", artikel.thumbnail || "");
-
-  document.querySelector("meta[property='og:url']")
-    .setAttribute("content", window.location.href);
+  }catch(err){
+    console.error(err);
+    el.innerHTML = "Terjadi kesalahan memuat artikel";
+  }
 }
 
 loadArticle();
@@ -108,3 +158,4 @@ loadArticle();
 
 </body>
 </html>
+
