@@ -78,7 +78,7 @@ button.submit{padding:14px;background:#111;color:#fff;border:none;border-radius:
 <script type="module">
 import { ArtikelAPI } from "./artikel.js";
 import { supabase } from "../js/supabase.js";
-import "./editor.js";
+import { Editor } from "./editor.js";
 
 Editor.init("editor");
 
@@ -88,7 +88,7 @@ const preview = document.getElementById("preview");
 
 let selectedFile = null;
 
-/* ================= PREVIEW MEDIA ================= */
+/* PREVIEW */
 mediaInput.addEventListener("change", function(){
   preview.innerHTML="";
   selectedFile=this.files[0];
@@ -105,7 +105,7 @@ mediaInput.addEventListener("change", function(){
   reader.readAsDataURL(selectedFile);
 });
 
-/* ================= SUBMIT ================= */
+/* SUBMIT */
 form.addEventListener("submit", async e=>{
   e.preventDefault();
 
@@ -117,15 +117,9 @@ form.addEventListener("submit", async e=>{
   const meta_desc = Editor.makeMetaDesc(Editor.getText());
   const slug = Editor.makeSlug(title);
 
-  if(!selectedFile){
-    alert("Upload media dulu");
-    return;
-  }
-
   try{
     const fileName=Date.now()+"_"+selectedFile.name;
 
-    // upload media
     const { error:uploadError }=
       await supabase.storage.from("artikel-media").upload(fileName,selectedFile);
 
@@ -136,7 +130,6 @@ form.addEventListener("submit", async e=>{
 
     const mediaUrl=urlData.publicUrl;
 
-    // save artikel
     const res = await ArtikelAPI.saveArticle({
       slug,
       title,
@@ -151,7 +144,9 @@ form.addEventListener("submit", async e=>{
     if(!res.success) throw res.error;
 
     alert("Artikel berhasil 🚀");
-    window.location.href=`/artikel/${slug}.html`;
+
+    // FIXED REDIRECT
+    window.location.href=`post.html?slug=${slug}`;
 
   }catch(err){
     console.error(err);
