@@ -248,15 +248,15 @@ function render(data){
 
     let mediaPreview = "";
 
-    if(a.gambar){
-      mediaPreview = `<img src="${a.gambar}" alt="${a.judul}">`;
+    if(a.thumbnail){
+      mediaPreview = `<img src="${a.thumbnail}" alt="${a.title}">`;
     }
 
     articleList.innerHTML += `
       <div class="article-card">
         ${mediaPreview}
         <div class="article-content">
-          <h3>${a.judul}</h3>
+          <h3>${a.title}</h3>
           <div class="meta">
             ${a.author ?? "Admin"} • 
             ${new Date(a.created_at).toLocaleDateString("id-ID")} • 
@@ -278,7 +278,7 @@ searchInput.addEventListener("keyup", function(){
   const keyword = this.value.toLowerCase();
 
   const filtered = articles.filter(a =>
-    a.judul.toLowerCase().includes(keyword) ||
+    a.title.toLowerCase().includes(keyword) ||
     (a.category && a.category.toLowerCase().includes(keyword))
   );
 
