@@ -10,79 +10,15 @@
 <link rel="stylesheet" href="../css/style.css">
 
 <style>
-
-.container{
-max-width:800px;
-margin:auto;
-padding:40px 20px
-}
-
-h1{margin-bottom:20px}
-
-form{
-display:flex;
-flex-direction:column;
-gap:15px
-}
-
-input,select{
-padding:12px;
-border-radius:8px;
-border:1px solid #ccc;
-font-size:14px
-}
-
-.editor-toolbar{
-display:flex;
-gap:10px;
-flex-wrap:wrap
-}
-
-.editor-toolbar button{
-padding:8px 10px;
-border:none;
-background:#111;
-color:#fff;
-border-radius:6px;
-cursor:pointer
-}
-
-.editor{
-min-height:250px;
-border:1px solid #ccc;
-border-radius:8px;
-padding:12px;
-background:#fff
-}
-
-.preview img,.preview video{
-width:100%;
-margin-top:10px;
-border-radius:10px
-}
-
-button.submit{
-padding:14px;
-background:#111;
-color:#fff;
-border:none;
-border-radius:8px;
-cursor:pointer;
-font-size:16px
-}
-
-.back{
-display:inline-block;
-margin-bottom:15px;
-color:#666;
-text-decoration:none
-}
-
-.loading{
-opacity:.6;
-pointer-events:none
-}
-
+.container{max-width:800px;margin:auto;padding:40px 20px}
+form{display:flex;flex-direction:column;gap:15px}
+input,select{padding:12px;border-radius:8px;border:1px solid #ccc}
+.editor-toolbar{display:flex;gap:8px;flex-wrap:wrap}
+.editor-toolbar button{padding:8px 10px;border:none;background:#111;color:#fff;border-radius:6px;cursor:pointer}
+.editor{min-height:250px;border:1px solid #ccc;border-radius:8px;padding:12px;background:#fff}
+.preview img,.preview video{width:100%;margin-top:10px;border-radius:10px}
+button.submit{padding:14px;background:#111;color:#fff;border:none;border-radius:8px;cursor:pointer}
+.back{margin-bottom:15px;display:inline-block;color:#666;text-decoration:none}
 </style>
 </head>
 <body>
@@ -94,8 +30,7 @@ pointer-events:none
   <form id="formArtikel">
 
     <input type="text" id="title" placeholder="Judul Artikel" required>
-
-    <input type="text" id="author" placeholder="Nama Penulis" value="Admin">
+    <input type="text" id="author" placeholder="Penulis" value="Admin">
 
     <select id="category">
       <option value="">Kategori</option>
@@ -108,45 +43,42 @@ pointer-events:none
     <input type="file" id="media" accept="image/*,video/*" required>
     <div class="preview" id="preview"></div>
 
-    <!-- TOOLBAR -->
+    <!-- TOOLBAR (INI YANG KAMU TANYA) -->
     <div class="editor-toolbar">
-      <button type="button" onclick="cmd('bold')"><b>B</b></button>
-      <button type="button" onclick="cmd('italic')"><i>I</i></button>
-      <button type="button" onclick="cmd('insertUnorderedList')">• List</button>
-      <button type="button" onclick="cmd('formatBlock','h2')">H2</button>
-      <button type="button" onclick="cmd('formatBlock','p')">P</button>
+      <button type="button" onclick="Editor.bold()"><b>B</b></button>
+      <button type="button" onclick="Editor.italic()"><i>I</i></button>
+      <button type="button" onclick="Editor.list()">• List</button>
+      <button type="button" onclick="Editor.h2()">H2</button>
+      <button type="button" onclick="Editor.paragraph()">P</button>
     </div>
 
     <!-- EDITOR -->
     <div id="editor" class="editor" contenteditable="true">
-      Tulis isi artikel di sini...
+      Tulis artikel di sini...
     </div>
 
-    <button type="submit" class="submit">Publikasikan Artikel</button>
+    <button type="submit" class="submit">Publikasikan</button>
 
   </form>
 </div>
 
-<!-- SCRIPTS -->
+<!-- SCRIPT URUTAN WAJIB -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="../js/supabase.js"></script>
 <script src="artikel.js"></script>
+<script src="editor.js"></script> <!-- INI YANG KAMU TANYA -->
 
 <script>
+Editor.init("editor"); // INI JUGA YANG KAMU TANYA
+
 const form = document.getElementById("formArtikel");
 const mediaInput = document.getElementById("media");
 const preview = document.getElementById("preview");
-const editor = document.getElementById("editor");
 
 let selectedFile = null;
 
-/* ================= RICH EDITOR ================= */
-function cmd(command, value=null){
-  document.execCommand(command,false,value);
-}
-
 /* ================= PREVIEW MEDIA ================= */
-mediaInput.addEventListener("change",function(){
+mediaInput.addEventListener("change", function(){
   preview.innerHTML="";
   selectedFile=this.files[0];
   if(!selectedFile) return;
@@ -165,51 +97,37 @@ mediaInput.addEventListener("change",function(){
 /* ================= SUBMIT ================= */
 form.addEventListener("submit", async e=>{
   e.preventDefault();
-  form.classList.add("loading");
 
   const title=document.getElementById("title").value.trim();
   const author=document.getElementById("author").value.trim()||"Admin";
   const category=document.getElementById("category").value;
-  const content=editor.innerHTML.trim();
+
+  // INI YANG KAMU TANYA 👇
+  const content = Editor.getHTML();
+  const meta_desc = Editor.makeMetaDesc(Editor.getText());
+  const slug = Editor.makeSlug(title);
 
   if(!selectedFile){
     alert("Upload media dulu");
-    form.classList.remove("loading");
     return;
   }
 
-  /* ===== SLUG SEO ===== */
-  const slug=title
-    .toLowerCase()
-    .replace(/[^\w ]+/g,'')
-    .replace(/ +/g,'-');
-
-  /* ===== META DESC AUTO ===== */
-  const metaDesc=content
-    .replace(/<[^>]*>/g,"")
-    .substring(0,150);
-
   try{
-
-    /* ===== UPLOAD MEDIA ===== */
     const fileName=Date.now()+"_"+selectedFile.name;
 
+    // upload media
     const { error:uploadError }=
-      await supabase.storage
-      .from("artikel-media")
-      .upload(fileName,selectedFile);
+      await supabase.storage.from("artikel-media").upload(fileName,selectedFile);
 
     if(uploadError) throw uploadError;
 
     const { data:urlData }=
-      supabase.storage
-      .from("artikel-media")
-      .getPublicUrl(fileName);
+      supabase.storage.from("artikel-media").getPublicUrl(fileName);
 
     const mediaUrl=urlData.publicUrl;
 
-    /* ===== SAVE DB ===== */
-    const result=await ArtikelAPI.saveArticle({
+    // save artikel
+    const res = await ArtikelAPI.saveArticle({
       slug,
       title,
       author,
@@ -217,27 +135,22 @@ form.addEventListener("submit", async e=>{
       content,
       thumbnail:mediaUrl,
       media:mediaUrl,
-      meta_desc:metaDesc
+      meta_desc
     });
 
-    if(!result.success) throw result.error;
+    if(!res.success) throw res.error;
 
-    alert("Artikel berhasil dipublish 🚀");
+    alert("Artikel berhasil 🚀");
 
-    /* Redirect ke halaman SEO */
     window.location.href=`/artikel/${slug}.html`;
 
   }catch(err){
     console.error(err);
     alert("Gagal publish artikel");
   }
-
-  form.classList.remove("loading");
 });
 </script>
 
 </body>
 </html>
-
-
 
