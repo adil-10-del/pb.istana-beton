@@ -75,10 +75,12 @@ button.submit{padding:14px;background:#111;color:#fff;border:none;border-radius:
 
 <!-- SCRIPT URUTAN WAJIB -->
 
+<script src="editor.js"></script>
+
+<!-- MODULE CMS -->
 <script type="module">
 import { ArtikelAPI } from "./artikel.js";
 import { supabase } from "../js/supabase.js";
-import { Editor } from "./editor.js";
 
 Editor.init("editor");
 
