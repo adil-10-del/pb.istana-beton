@@ -143,7 +143,12 @@ form.addEventListener("submit", async function(e){
       .getPublicUrl(fileName);
 
   // 3️⃣ Simpan ke tabel artikel
+  const slug = title.value
+  .toLowerCase()
+  .replace(/[^\w ]+/g,'')
+  .replace(/ +/g,'-');
   .insert([{
+  slug: slug,
   title: title.value,
   author: author.value,
   category: category.value,
