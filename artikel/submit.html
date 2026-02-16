@@ -88,7 +88,9 @@ const preview = document.getElementById("preview");
 
 let selectedFile = null;
 
-// Preview file
+// ============================
+// PREVIEW MEDIA
+// ============================
 mediaInput.addEventListener("change", function(){
 
   preview.innerHTML = "";
@@ -112,51 +114,72 @@ mediaInput.addEventListener("change", function(){
 });
 
 
-// Submit form
+// ============================
+// SUBMIT ARTIKEL
+// ============================
 form.addEventListener("submit", async function(e){
 
   e.preventDefault();
+
+  const title = document.getElementById("title");
+  const author = document.getElementById("author");
+  const category = document.getElementById("category");
+  const content = document.getElementById("content");
+  const date = document.getElementById("date");
 
   if(!selectedFile){
     alert("Pilih gambar terlebih dahulu");
     return;
   }
 
-  // 1️⃣ Upload ke Supabase Storage
+  // ============================
+  // 1️⃣ Upload ke Storage
+  // ============================
   const fileName = Date.now() + "_" + selectedFile.name;
 
-  const { data: uploadData, error: uploadError } =
+  const { error: uploadError } =
     await supabase.storage
       .from("artikel-media")
       .upload(fileName, selectedFile);
 
   if(uploadError){
     console.error(uploadError);
-    alert("Upload gagal");
+    alert("Upload media gagal");
     return;
   }
 
-  // 2️⃣ Ambil URL public
+  // ============================
+  // 2️⃣ Ambil Public URL
+  // ============================
   const { data: publicUrl } =
     supabase.storage
       .from("artikel-media")
       .getPublicUrl(fileName);
 
-  // 3️⃣ Simpan ke tabel artikel
+  // ============================
+  // 3️⃣ Generate Slug
+  // ============================
   const slug = title.value
-  .toLowerCase()
-  .replace(/[^\w ]+/g,'')
-  .replace(/ +/g,'-');
-  .insert([{
-  slug: slug,
-  title: title.value,
-  author: author.value,
-  category: category.value,
-  content: "<p>"+content.value.replace(/\n/g,"</p><p>")+"</p>",
-  thumbnail: publicUrl.publicUrl,
-  media: publicUrl.publicUrl,
-  views: 0
-}])
+    .toLowerCase()
+    .replace(/[^\w ]+/g,'')
+    .replace(/ +/g,'-');
+
+  // ============================
+  // 4️⃣ Insert ke Database
+  // ============================
+  const { error } = await supabase
+    .from("artikel")
+    .insert([{
+      slug: slug,
+      title: title.value,
+      author: author.value,
+      category: category.value,
+      content: "<p>" + content.value.replace(/\n/g,"</p><p>") + "</p>",
+      thumbnail: publicUrl.publicUrl,
+      media: publicUrl.publicUrl,
+      views: 0,
+      created_at: date.value
+    }]);
 
   if(error){
     console.error(error);
