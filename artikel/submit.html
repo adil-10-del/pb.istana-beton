@@ -58,24 +58,24 @@ const preview = document.getElementById("preview");
 
 let selectedFile = null;
 
-// PREVIEW MEDIA
-mediaInput.addEventListener("change", function(){
+// PREVIEW
+mediaInput.addEventListener("change", function () {
   preview.innerHTML = "";
   selectedFile = this.files[0];
 
-  if(!selectedFile) return;
+  if (!selectedFile) return;
 
   const url = URL.createObjectURL(selectedFile);
 
-  if(selectedFile.type.startsWith("image")){
+  if (selectedFile.type.startsWith("image")) {
     preview.innerHTML = `<img src="${url}">`;
-  }else{
+  } else {
     preview.innerHTML = `<video src="${url}" controls></video>`;
   }
 });
 
 // SUBMIT
-form.addEventListener("submit", async function(e){
+form.addEventListener("submit", async function (e) {
   e.preventDefault();
 
   const title = document.getElementById("title").value.trim();
@@ -84,59 +84,55 @@ form.addEventListener("submit", async function(e){
   const content = document.getElementById("content").value;
   const date = document.getElementById("date").value;
 
-  if(!selectedFile){
+  if (!selectedFile) {
     alert("Pilih media terlebih dahulu");
     return;
   }
 
-  try{
-
-    // ================= UPLOAD STORAGE
+  try {
+    // UPLOAD FILE
     const fileName = Date.now() + "_" + selectedFile.name;
 
     const { error: uploadError } = await supabase.storage
       .from("artikel-media")
       .upload(fileName, selectedFile);
 
-    if(uploadError) throw uploadError;
+    if (uploadError) throw uploadError;
 
-    // ================= GET URL
     const { data } = supabase.storage
       .from("artikel-media")
       .getPublicUrl(fileName);
 
     const mediaUrl = data.publicUrl;
 
-    // ================= SLUG
+    // SLUG
     const slug = title
       .toLowerCase()
-      .replace(/[^\w ]+/g,'')
-      .replace(/ +/g,'-');
+      .replace(/[^\w ]+/g, "")
+      .replace(/ +/g, "-");
 
-    // ================= FORMAT HTML CONTENT
-    const htmlContent = "<p>" + content.replace(/\n/g,"</p><p>") + "</p>";
+    // FORMAT CONTENT
+    const htmlContent = "<p>" + content.replace(/\n/g, "</p><p>") + "</p>";
 
-    // ================= INSERT DB
-    const { error } = await supabase
-      .from("artikel")
-      .insert([{
-        slug,
-        title,
-        author,
-        category,
-        content: htmlContent,
-        thumbnail: mediaUrl,
-        media: mediaUrl,
-        views: 0,
-        created_at: date
-      }]);
+    // SAVE VIA API
+    const result = await ArtikelAPI.saveArticle({
+      slug,
+      title,
+      author,
+      category,
+      content: htmlContent,
+      thumbnail: mediaUrl,
+      media: mediaUrl,
+      views: 0,
+      created_at: date
+    });
 
-    if(error) throw error;
+    if (!result.success) throw result.error;
 
     alert("Artikel berhasil dipublikasikan!");
-    window.location.href = "index.html";
+    location.href = "index.html";
 
-  }catch(err){
+  } catch (err) {
     console.error(err);
     alert("Gagal upload artikel");
   }
