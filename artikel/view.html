@@ -204,7 +204,9 @@ async function loadArticle(){
     return;
   }
 
+  // =========================
   // Ambil artikel berdasarkan ID
+  // =========================
   const { data: article, error } = await supabase
     .from("artikel")
     .select("*")
@@ -216,33 +218,72 @@ async function loadArticle(){
     return;
   }
 
+  // =========================
+  // UPDATE VIEW COUNTER
+  // =========================
+  await supabase
+    .from("artikel")
+    .update({ views: (article.views || 0) + 1 })
+    .eq("id", article.id);
+
+  // =========================
   // Breadcrumb
+  // =========================
   breadcrumb.innerHTML = `
     <a href="../index.html">Beranda</a> /
     <a href="index.html">Artikel</a> /
-    ${article.judul}
+    ${article.title}
   `;
 
-  // Isi Artikel
+  // =========================
+  // Render Artikel
+  // =========================
   container.innerHTML = `
-    <h1>${article.judul}</h1>
+    <h1>${article.title}</h1>
+
     <div class="meta">
       ${article.author ?? "Admin"} • 
       ${new Date(article.created_at).toLocaleDateString("id-ID")} • 
-      ${article.category ?? "Artikel"}
+      ${article.category ?? "Artikel"} • 
+      👁 ${(article.views ?? 0) + 1} dilihat
     </div>
-    ${article.gambar ? `<img src="${article.gambar}" alt="${article.judul}">` : ""}
-    <div>${article.isi}</div>
+
+    ${article.thumbnail ? `<img src="${article.thumbnail}" alt="${article.title}">` : ""}
+
+    <div>${article.content}</div>
+
+    <a class="cta-wa"
+       target="_blank"
+       href="https://wa.me/6283862786829?text=${encodeURIComponent(
+         "Halo PB Istana Beton, saya tertarik setelah membaca artikel: " + article.title
+       )}">
+       💬 Konsultasi & Tanya Harga via WhatsApp
+    </a>
+
     <a href="index.html" class="back-btn">← Kembali ke Artikel</a>
   `;
 
+  // =========================
   // Update Open Graph
-  document.querySelector("meta[property='og:title']").setAttribute("content", article.judul);
-  document.querySelector("meta[property='og:description']").setAttribute("content", article.isi.replace(/<[^>]*>/g, "").substring(0,150));
-  document.querySelector("meta[property='og:image']").setAttribute("content", article.gambar ?? "");
-  document.querySelector("meta[property='og:url']").setAttribute("content", window.location.href);
+  // =========================
+  document.querySelector("meta[property='og:title']")
+    .setAttribute("content", article.title);
 
-  // Ambil Artikel Terkait
+  document.querySelector("meta[property='og:description']")
+    .setAttribute(
+      "content",
+      article.content.replace(/<[^>]*>/g, "").substring(0,150)
+    );
+
+  document.querySelector("meta[property='og:image']")
+    .setAttribute("content", article.thumbnail ?? "");
+
+  document.querySelector("meta[property='og:url']")
+    .setAttribute("content", window.location.href);
+
+  // =========================
+  // Artikel Terkait
+  // =========================
   const { data: related } = await supabase
     .from("artikel")
     .select("*")
@@ -250,15 +291,17 @@ async function loadArticle(){
     .limit(3);
 
   if(related && related.length){
+
     relatedContainer.innerHTML = "<h3>Artikel Lainnya</h3>";
 
     related.forEach(r => {
       relatedContainer.innerHTML += `
         <div class="related-item">
-          <a href="view.html?id=${r.id}">${r.judul}</a>
+          <a href="view.html?id=${r.id}">${r.title}</a>
         </div>
       `;
     });
+
   }
 
 }
