@@ -185,44 +185,85 @@
 💬 WhatsApp
 </a>
 
-<script src="artikel-data.js"></script>
-<script>
+<script src="artikel.js"></script>
+<script type="module">
+
+import { supabase } from "../js/supabase.js";
 
 const params = new URLSearchParams(window.location.search);
 const id = params.get("id");
 
 const container = document.getElementById("articleDetail");
+const breadcrumb = document.getElementById("breadcrumb");
+const relatedContainer = document.getElementById("relatedArticles");
 
-let articles = getAllArticles();
+async function loadArticle(){
 
-const article = articles.find(a => a.id === id);
+  if(!id){
+    container.innerHTML = "<h2>Artikel tidak ditemukan</h2>";
+    return;
+  }
 
-if(!article){
-  container.innerHTML = "<h2>Artikel tidak ditemukan</h2>";
-}else{
+  // Ambil artikel berdasarkan ID
+  const { data: article, error } = await supabase
+    .from("artikel")
+    .select("*")
+    .eq("id", id)
+    .single();
 
-  let mediaHTML = "";
+  if(error || !article){
+    container.innerHTML = "<h2>Artikel tidak ditemukan</h2>";
+    return;
+  }
 
-  if(article.media && article.media.length){
-    article.media.forEach(m => {
-      if(m.type.startsWith("video")){
-        mediaHTML += `<video src="${m.url}" controls></video>`;
-      }else{
-        mediaHTML += `<img src="${m.url}" alt="${article.title}">`;
-      }
+  // Breadcrumb
+  breadcrumb.innerHTML = `
+    <a href="../index.html">Beranda</a> /
+    <a href="index.html">Artikel</a> /
+    ${article.judul}
+  `;
+
+  // Isi Artikel
+  container.innerHTML = `
+    <h1>${article.judul}</h1>
+    <div class="meta">
+      ${article.author ?? "Admin"} • 
+      ${new Date(article.created_at).toLocaleDateString("id-ID")} • 
+      ${article.category ?? "Artikel"}
+    </div>
+    ${article.gambar ? `<img src="${article.gambar}" alt="${article.judul}">` : ""}
+    <div>${article.isi}</div>
+    <a href="index.html" class="back-btn">← Kembali ke Artikel</a>
+  `;
+
+  // Update Open Graph
+  document.querySelector("meta[property='og:title']").setAttribute("content", article.judul);
+  document.querySelector("meta[property='og:description']").setAttribute("content", article.isi.replace(/<[^>]*>/g, "").substring(0,150));
+  document.querySelector("meta[property='og:image']").setAttribute("content", article.gambar ?? "");
+  document.querySelector("meta[property='og:url']").setAttribute("content", window.location.href);
+
+  // Ambil Artikel Terkait
+  const { data: related } = await supabase
+    .from("artikel")
+    .select("*")
+    .neq("id", id)
+    .limit(3);
+
+  if(related && related.length){
+    relatedContainer.innerHTML = "<h3>Artikel Lainnya</h3>";
+
+    related.forEach(r => {
+      relatedContainer.innerHTML += `
+        <div class="related-item">
+          <a href="view.html?id=${r.id}">${r.judul}</a>
+        </div>
+      `;
     });
   }
 
-  container.innerHTML = `
-    <h1>${article.title}</h1>
-    <div class="meta">
-      ${article.author} • ${article.date} • ${article.category}
-    </div>
-    ${mediaHTML}
-    <div>${article.content}</div>
-    <a href="index.html" class="back-btn">← Kembali ke Artikel</a>
-  `;
 }
+
+loadArticle();
 
 </script>
 
