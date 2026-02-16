@@ -3,55 +3,26 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tulis Artikel</title>
+
+<title>Tulis Artikel | PB. Istana Beton</title>
 <link rel="stylesheet" href="../css/style.css">
 
 <style>
+.container{max-width:700px;margin:auto;padding:40px 20px}
+form{display:flex;flex-direction:column;gap:15px}
+input,textarea,select{padding:12px;border-radius:8px;border:1px solid #ccc}
+textarea{min-height:200px}
+button{padding:12px;background:#111;color:#fff;border:none;border-radius:8px;cursor:pointer}
 
-.container{
-  max-width:700px;
-  margin:auto;
-  padding:40px 20px;
-}
+.preview img,.preview video{width:100%;margin-top:10px;border-radius:10px}
 
-form{
-  display:flex;
-  flex-direction:column;
-  gap:15px;
-}
-
-input, textarea, select{
-  padding:12px;
-  border-radius:8px;
-  border:1px solid #ccc;
-}
-
-textarea{
-  min-height:200px;
-}
-
-button{
-  padding:12px;
-  background:#111;
-  color:#fff;
-  border:none;
-  border-radius:8px;
-  cursor:pointer;
-}
-
-.preview img, .preview video{
-  width:100%;
-  margin-top:10px;
-  border-radius:10px;
-}
-
+.back{display:inline-block;margin-bottom:15px;text-decoration:none;color:#111}
 </style>
 </head>
 <body>
 
 <div class="container">
   <h1>Tulis Artikel</h1>
-  
   <a href="index.html" class="back">← Kembali ke Artikel</a>
 
   <form id="formArtikel">
@@ -66,9 +37,7 @@ button{
       <option>Inspirasi Desain</option>
     </select>
 
-    <!-- UPLOAD FOTO / VIDEO -->
-    <input type="file" id="media" accept="image/*,video/*" multiple required>
-
+    <input type="file" id="media" accept="image/*,video/*" required>
     <div class="preview" id="preview"></div>
 
     <textarea id="content" placeholder="Isi Artikel..." required></textarea>
@@ -77,124 +46,103 @@ button{
   </form>
 </div>
 
-<script src="artikel.js"></script>
-<script type="module">
+<!-- SUPABASE -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+<script src="../js/supabase.js"></script>
 
-import { supabase } from "../../js/supabase.js";
-
+<script>
 const form = document.getElementById("formArtikel");
 const mediaInput = document.getElementById("media");
 const preview = document.getElementById("preview");
 
 let selectedFile = null;
 
-// ============================
 // PREVIEW MEDIA
-// ============================
 mediaInput.addEventListener("change", function(){
-
   preview.innerHTML = "";
   selectedFile = this.files[0];
 
   if(!selectedFile) return;
 
-  const reader = new FileReader();
+  const url = URL.createObjectURL(selectedFile);
 
-  reader.onload = function(e){
-
-    if(selectedFile.type.startsWith("image")){
-      preview.innerHTML = `<img src="${e.target.result}">`;
-    }else{
-      preview.innerHTML = `<video src="${e.target.result}" controls></video>`;
-    }
-
-  };
-
-  reader.readAsDataURL(selectedFile);
+  if(selectedFile.type.startsWith("image")){
+    preview.innerHTML = `<img src="${url}">`;
+  }else{
+    preview.innerHTML = `<video src="${url}" controls></video>`;
+  }
 });
 
-
-// ============================
-// SUBMIT ARTIKEL
-// ============================
+// SUBMIT
 form.addEventListener("submit", async function(e){
-
   e.preventDefault();
 
-  const title = document.getElementById("title");
-  const author = document.getElementById("author");
-  const category = document.getElementById("category");
-  const content = document.getElementById("content");
-  const date = document.getElementById("date");
+  const title = document.getElementById("title").value.trim();
+  const author = document.getElementById("author").value.trim();
+  const category = document.getElementById("category").value;
+  const content = document.getElementById("content").value;
+  const date = document.getElementById("date").value;
 
   if(!selectedFile){
-    alert("Pilih gambar terlebih dahulu");
+    alert("Pilih media terlebih dahulu");
     return;
   }
 
-  // ============================
-  // 1️⃣ Upload ke Storage
-  // ============================
-  const fileName = Date.now() + "_" + selectedFile.name;
+  try{
 
-  const { error: uploadError } =
-    await supabase.storage
+    // ================= UPLOAD STORAGE
+    const fileName = Date.now() + "_" + selectedFile.name;
+
+    const { error: uploadError } = await supabase.storage
       .from("artikel-media")
       .upload(fileName, selectedFile);
 
-  if(uploadError){
-    console.error(uploadError);
-    alert("Upload media gagal");
-    return;
-  }
+    if(uploadError) throw uploadError;
 
-  // ============================
-  // 2️⃣ Ambil Public URL
-  // ============================
-  const { data: publicUrl } =
-    supabase.storage
+    // ================= GET URL
+    const { data } = supabase.storage
       .from("artikel-media")
       .getPublicUrl(fileName);
 
-  // ============================
-  // 3️⃣ Generate Slug
-  // ============================
-  const slug = title.value
-    .toLowerCase()
-    .replace(/[^\w ]+/g,'')
-    .replace(/ +/g,'-');
+    const mediaUrl = data.publicUrl;
 
-  // ============================
-  // 4️⃣ Insert ke Database
-  // ============================
-  const { error } = await supabase
-    .from("artikel")
-    .insert([{
-      slug: slug,
-      title: title.value,
-      author: author.value,
-      category: category.value,
-      content: "<p>" + content.value.replace(/\n/g,"</p><p>") + "</p>",
-      thumbnail: publicUrl.publicUrl,
-      media: publicUrl.publicUrl,
-      views: 0,
-      created_at: date.value
-    }]);
+    // ================= SLUG
+    const slug = title
+      .toLowerCase()
+      .replace(/[^\w ]+/g,'')
+      .replace(/ +/g,'-');
 
-  if(error){
-    console.error(error);
-    alert("Gagal menyimpan artikel");
-    return;
+    // ================= FORMAT HTML CONTENT
+    const htmlContent = "<p>" + content.replace(/\n/g,"</p><p>") + "</p>";
+
+    // ================= INSERT DB
+    const { error } = await supabase
+      .from("artikel")
+      .insert([{
+        slug,
+        title,
+        author,
+        category,
+        content: htmlContent,
+        thumbnail: mediaUrl,
+        media: mediaUrl,
+        views: 0,
+        created_at: date
+      }]);
+
+    if(error) throw error;
+
+    alert("Artikel berhasil dipublikasikan!");
+    window.location.href = "index.html";
+
+  }catch(err){
+    console.error(err);
+    alert("Gagal upload artikel");
   }
-
-  alert("Artikel berhasil dipublikasikan!");
-
-  window.location.href = "index.html";
-
 });
-
 </script>
-  
+
 </body>
 </html>
+
 
