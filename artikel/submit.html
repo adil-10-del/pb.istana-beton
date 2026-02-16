@@ -5,18 +5,84 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Tulis Artikel | PB. Istana Beton</title>
+<meta name="robots" content="noindex">
+
 <link rel="stylesheet" href="../css/style.css">
 
 <style>
-.container{max-width:700px;margin:auto;padding:40px 20px}
-form{display:flex;flex-direction:column;gap:15px}
-input,textarea,select{padding:12px;border-radius:8px;border:1px solid #ccc}
-textarea{min-height:200px}
-button{padding:12px;background:#111;color:#fff;border:none;border-radius:8px;cursor:pointer}
 
-.preview img,.preview video{width:100%;margin-top:10px;border-radius:10px}
+.container{
+max-width:800px;
+margin:auto;
+padding:40px 20px
+}
 
-.back{display:inline-block;margin-bottom:15px;text-decoration:none;color:#111}
+h1{margin-bottom:20px}
+
+form{
+display:flex;
+flex-direction:column;
+gap:15px
+}
+
+input,select{
+padding:12px;
+border-radius:8px;
+border:1px solid #ccc;
+font-size:14px
+}
+
+.editor-toolbar{
+display:flex;
+gap:10px;
+flex-wrap:wrap
+}
+
+.editor-toolbar button{
+padding:8px 10px;
+border:none;
+background:#111;
+color:#fff;
+border-radius:6px;
+cursor:pointer
+}
+
+.editor{
+min-height:250px;
+border:1px solid #ccc;
+border-radius:8px;
+padding:12px;
+background:#fff
+}
+
+.preview img,.preview video{
+width:100%;
+margin-top:10px;
+border-radius:10px
+}
+
+button.submit{
+padding:14px;
+background:#111;
+color:#fff;
+border:none;
+border-radius:8px;
+cursor:pointer;
+font-size:16px
+}
+
+.back{
+display:inline-block;
+margin-bottom:15px;
+color:#666;
+text-decoration:none
+}
+
+.loading{
+opacity:.6;
+pointer-events:none
+}
+
 </style>
 </head>
 <body>
@@ -26,28 +92,43 @@ button{padding:12px;background:#111;color:#fff;border:none;border-radius:8px;cur
   <a href="index.html" class="back">← Kembali ke Artikel</a>
 
   <form id="formArtikel">
-    <input type="text" id="title" placeholder="Judul Artikel" required>
-    <input type="text" id="author" placeholder="Nama Penulis" required>
-    <input type="date" id="date" required>
 
-    <select id="category" required>
-      <option value="">Pilih Kategori</option>
+    <input type="text" id="title" placeholder="Judul Artikel" required>
+
+    <input type="text" id="author" placeholder="Nama Penulis" value="Admin">
+
+    <select id="category">
+      <option value="">Kategori</option>
       <option>Tips & Tutorial</option>
       <option>Edukasi Material</option>
       <option>Inspirasi Desain</option>
     </select>
 
+    <!-- MEDIA -->
     <input type="file" id="media" accept="image/*,video/*" required>
     <div class="preview" id="preview"></div>
 
-    <textarea id="content" placeholder="Isi Artikel..." required></textarea>
+    <!-- TOOLBAR -->
+    <div class="editor-toolbar">
+      <button type="button" onclick="cmd('bold')"><b>B</b></button>
+      <button type="button" onclick="cmd('italic')"><i>I</i></button>
+      <button type="button" onclick="cmd('insertUnorderedList')">• List</button>
+      <button type="button" onclick="cmd('formatBlock','h2')">H2</button>
+      <button type="button" onclick="cmd('formatBlock','p')">P</button>
+    </div>
 
-    <button type="submit">Publikasikan</button>
+    <!-- EDITOR -->
+    <div id="editor" class="editor" contenteditable="true">
+      Tulis isi artikel di sini...
+    </div>
+
+    <button type="submit" class="submit">Publikasikan Artikel</button>
+
   </form>
 </div>
 
-<!-- SUPABASE -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+<!-- SCRIPTS -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="../js/supabase.js"></script>
 <script src="artikel.js"></script>
 
@@ -55,91 +136,108 @@ button{padding:12px;background:#111;color:#fff;border:none;border-radius:8px;cur
 const form = document.getElementById("formArtikel");
 const mediaInput = document.getElementById("media");
 const preview = document.getElementById("preview");
+const editor = document.getElementById("editor");
 
 let selectedFile = null;
 
-// PREVIEW
-mediaInput.addEventListener("change", function () {
-  preview.innerHTML = "";
-  selectedFile = this.files[0];
+/* ================= RICH EDITOR ================= */
+function cmd(command, value=null){
+  document.execCommand(command,false,value);
+}
 
-  if (!selectedFile) return;
+/* ================= PREVIEW MEDIA ================= */
+mediaInput.addEventListener("change",function(){
+  preview.innerHTML="";
+  selectedFile=this.files[0];
+  if(!selectedFile) return;
 
-  const url = URL.createObjectURL(selectedFile);
-
-  if (selectedFile.type.startsWith("image")) {
-    preview.innerHTML = `<img src="${url}">`;
-  } else {
-    preview.innerHTML = `<video src="${url}" controls></video>`;
-  }
+  const reader=new FileReader();
+  reader.onload=e=>{
+    if(selectedFile.type.startsWith("image")){
+      preview.innerHTML=`<img src="${e.target.result}">`;
+    }else{
+      preview.innerHTML=`<video src="${e.target.result}" controls></video>`;
+    }
+  };
+  reader.readAsDataURL(selectedFile);
 });
 
-// SUBMIT
-form.addEventListener("submit", async function (e) {
+/* ================= SUBMIT ================= */
+form.addEventListener("submit", async e=>{
   e.preventDefault();
+  form.classList.add("loading");
 
-  const title = document.getElementById("title").value.trim();
-  const author = document.getElementById("author").value.trim();
-  const category = document.getElementById("category").value;
-  const content = document.getElementById("content").value;
-  const date = document.getElementById("date").value;
+  const title=document.getElementById("title").value.trim();
+  const author=document.getElementById("author").value.trim()||"Admin";
+  const category=document.getElementById("category").value;
+  const content=editor.innerHTML.trim();
 
-  if (!selectedFile) {
-    alert("Pilih media terlebih dahulu");
+  if(!selectedFile){
+    alert("Upload media dulu");
+    form.classList.remove("loading");
     return;
   }
 
-  try {
-    // UPLOAD FILE
-    const fileName = Date.now() + "_" + selectedFile.name;
+  /* ===== SLUG SEO ===== */
+  const slug=title
+    .toLowerCase()
+    .replace(/[^\w ]+/g,'')
+    .replace(/ +/g,'-');
 
-    const { error: uploadError } = await supabase.storage
+  /* ===== META DESC AUTO ===== */
+  const metaDesc=content
+    .replace(/<[^>]*>/g,"")
+    .substring(0,150);
+
+  try{
+
+    /* ===== UPLOAD MEDIA ===== */
+    const fileName=Date.now()+"_"+selectedFile.name;
+
+    const { error:uploadError }=
+      await supabase.storage
       .from("artikel-media")
-      .upload(fileName, selectedFile);
+      .upload(fileName,selectedFile);
 
-    if (uploadError) throw uploadError;
+    if(uploadError) throw uploadError;
 
-    const { data } = supabase.storage
+    const { data:urlData }=
+      supabase.storage
       .from("artikel-media")
       .getPublicUrl(fileName);
 
-    const mediaUrl = data.publicUrl;
+    const mediaUrl=urlData.publicUrl;
 
-    // SLUG
-    const slug = title
-      .toLowerCase()
-      .replace(/[^\w ]+/g, "")
-      .replace(/ +/g, "-");
-
-    // FORMAT CONTENT
-    const htmlContent = "<p>" + content.replace(/\n/g, "</p><p>") + "</p>";
-
-    // SAVE VIA API
-    const result = await ArtikelAPI.saveArticle({
+    /* ===== SAVE DB ===== */
+    const result=await ArtikelAPI.saveArticle({
       slug,
       title,
       author,
       category,
-      content: htmlContent,
-      thumbnail: mediaUrl,
-      media: mediaUrl,
-      views: 0,
-      created_at: date
+      content,
+      thumbnail:mediaUrl,
+      media:mediaUrl,
+      meta_desc:metaDesc
     });
 
-    if (!result.success) throw result.error;
+    if(!result.success) throw result.error;
 
-    alert("Artikel berhasil dipublikasikan!");
-    location.href = "index.html";
+    alert("Artikel berhasil dipublish 🚀");
 
-  } catch (err) {
+    /* Redirect ke halaman SEO */
+    window.location.href=`/artikel/${slug}.html`;
+
+  }catch(err){
     console.error(err);
-    alert("Gagal upload artikel");
+    alert("Gagal publish artikel");
   }
+
+  form.classList.remove("loading");
 });
 </script>
 
 </body>
 </html>
+
 
 
