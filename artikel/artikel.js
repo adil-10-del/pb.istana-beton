@@ -33,3 +33,18 @@ export async function saveArticle(article) {
   return { success:true, data };
 }
 
+export async function getArticleById(id) {
+
+  const { data, error } = await supabase
+    .from('artikel')
+    .select('*')
+    .eq('id', id)
+    .single();
+
+  if (error) {
+    console.error(error);
+    return null;
+  }
+
+  return data;
+}
