@@ -1,7 +1,8 @@
-// CDN Supabase harus diload dulu di HTML
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2?target=es2020";
 
-const SUPABASE_URL = "https://tcuimqhiilfervvjfcey.supabase.co";
-const SUPABASE_KEY = "sb_publishable_LINoyHDPvUvWDVB6OHBXWg_1BK_EAIu";
+window.supabaseClient = createClient(
+  "https://tcuimqhiilfervvjfcey.supabase.co",
+  "sb_publishable_LINoyHDPvUvWDVB6OHBXWg_1BK_EAIu"
+);
 
-window.supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
