@@ -69,91 +69,83 @@ body{background:#0f0f0f;color:#fff;font-family:sans-serif}
 </div>
 
 <!-- GLOBAL SCRIPT -->
-<script src="editor.js"></script> <!-- optional future reuse -->
+<!-- WAJIB URUT -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/supabase.js"></script>
+<script src="artikel.js"></script>
+<script src="router.js"></script>
 
-<!-- MODULE SCRIPT -->
-<script type="module">
-import { ArtikelAPI } from "./artikel.js";
-import { supabase } from "../js/supabase.js";
-import { getSlug } from "./router.js";
+<script>
+(async function () {
 
-const el = document.getElementById("article");
+  const el = document.getElementById("article");
+  const slug = getSlug();
 
-async function loadArticle(){
-  try{
-    const slug = getSlug();
-
-    if(!slug){
-      el.innerHTML = "Artikel tidak ditemukan";
-      return;
-    }
-
-    const artikel = await ArtikelAPI.getArticleBySlug(slug);
-
-    if(!artikel){
-      el.innerHTML = "Artikel tidak ditemukan";
-      return;
-    }
-
-    /* ================= UPDATE VIEW ================= */
-    ArtikelAPI.updateArticleViews(artikel.id, artikel.views || 0);
-
-    /* ================= RENDER ================= */
-    el.innerHTML = `
-      <div class="article">
-        <h1>${artikel.title}</h1>
-
-        <div class="meta">
-          ${artikel.author || "Admin"} • 
-          ${new Date(artikel.created_at).toLocaleDateString("id-ID")} • 
-          👁 ${(artikel.views || 0) + 1}
-        </div>
-
-        ${artikel.thumbnail ? `<img src="${artikel.thumbnail}" loading="lazy">` : ""}
-
-        <div>${artikel.content}</div>
-
-        <a class="cta"
-           target="_blank"
-           href="https://wa.me/6283862786829?text=${encodeURIComponent(
-             "Halo PB Istana Beton, saya tertarik setelah membaca artikel: " + artikel.title
-           )}">
-           💬 Konsultasi via WhatsApp
-        </a>
-
-        <a href="/artikel/index.html" class="back">← Kembali ke artikel</a>
-      </div>
-    `;
-
-    /* ================= SEO DINAMIS ================= */
-    const title = artikel.title + " | PB. Istana Beton";
-    const desc = artikel.meta_desc || artikel.title;
-    const image = artikel.thumbnail || "";
-
-    document.title = title;
-
-    document.querySelector('meta[name="description"]')
-      .setAttribute("content", desc);
-
-    document.querySelector("meta[property='og:title']")
-      .setAttribute("content", title);
-
-    document.querySelector("meta[property='og:description']")
-      .setAttribute("content", desc);
-
-    document.querySelector("meta[property='og:image']")
-      .setAttribute("content", image);
-
-    document.querySelector("meta[property='og:url']")
-      .setAttribute("content", window.location.href);
-
-  }catch(err){
-    console.error(err);
-    el.innerHTML = "Terjadi kesalahan memuat artikel";
+  if (!slug) {
+    el.innerHTML = "Artikel tidak ditemukan";
+    return;
   }
-}
 
-loadArticle();
+  const artikel = await ArtikelAPI.getBySlug(slug);
+
+  if (!artikel) {
+    el.innerHTML = "Artikel tidak ditemukan";
+    return;
+  }
+
+  // update view
+  ArtikelAPI.addView(artikel.id, artikel.views || 0);
+
+  // render
+  el.innerHTML = `
+    <div class="article">
+      <h1>${artikel.title}</h1>
+
+      <div class="meta">
+        ${artikel.author || "Admin"} • 
+        ${new Date(artikel.created_at).toLocaleDateString("id-ID")} • 
+        👁 ${(artikel.views || 0) + 1}
+      </div>
+
+      ${artikel.thumbnail ? `<img src="${artikel.thumbnail}" loading="lazy">` : ""}
+
+      <div>${artikel.content}</div>
+
+      <a class="cta"
+         target="_blank"
+         href="https://wa.me/6283862786829?text=${encodeURIComponent(
+           "Halo PB Istana Beton, saya tertarik setelah membaca artikel: " + artikel.title
+         )}">
+         💬 Konsultasi via WhatsApp
+      </a>
+
+      <a href="/artikel/index.html" class="back">← Kembali ke artikel</a>
+    </div>
+  `;
+
+  // SEO dinamis
+  const title = artikel.title + " | PB. Istana Beton";
+  const desc = artikel.meta_desc || artikel.title;
+  const image = artikel.thumbnail || "";
+
+  document.title = title;
+
+  document.querySelector('meta[name="description"]')
+    .setAttribute("content", desc);
+
+  document.querySelector("meta[property='og:title']")
+    .setAttribute("content", title);
+
+  document.querySelector("meta[property='og:description']")
+    .setAttribute("content", desc);
+
+  document.querySelector("meta[property='og:image']")
+    .setAttribute("content", image);
+
+  document.querySelector("meta[property='og:url']")
+    .setAttribute("content", location.href);
+
+})();
 </script>
 
 </body>
