@@ -75,13 +75,16 @@ button.submit{padding:14px;background:#111;color:#fff;border:none;border-radius:
 
 <!-- SCRIPT URUTAN WAJIB -->
 
+<!-- WAJIB: CDN SUPABASE -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<!-- GLOBAL ENGINE -->
+<script src="../js/supabase.js"></script>
+<script src="artikel.js"></script>
 <script src="editor.js"></script>
 
 <!-- MODULE CMS -->
-<script type="module">
-import { ArtikelAPI } from "./artikel.js";
-import { supabase } from "../js/supabase.js";
-
+<script>
 Editor.init("editor");
 
 const form = document.getElementById("formArtikel");
@@ -123,16 +126,16 @@ form.addEventListener("submit", async e=>{
     const fileName=Date.now()+"_"+selectedFile.name;
 
     const { error:uploadError }=
-      await supabase.storage.from("artikel-media").upload(fileName,selectedFile);
+      await supabaseClient.storage.from("artikel-media").upload(fileName,selectedFile);
 
     if(uploadError) throw uploadError;
 
     const { data:urlData }=
-      supabase.storage.from("artikel-media").getPublicUrl(fileName);
+      supabaseClient.storage.from("artikel-media").getPublicUrl(fileName);
 
     const mediaUrl=urlData.publicUrl;
 
-    const res = await ArtikelAPI.saveArticle({
+    const res = await ArtikelAPI.save({
       slug,
       title,
       author,
@@ -147,8 +150,8 @@ form.addEventListener("submit", async e=>{
 
     alert("Artikel berhasil 🚀");
 
-    // FIXED REDIRECT
-    window.location.href=`post.html?slug=${slug}`;
+    // SEO REDIRECT
+    window.location.href=`/artikel/${slug}.html`;
 
   }catch(err){
     console.error(err);
@@ -156,7 +159,6 @@ form.addEventListener("submit", async e=>{
   }
 });
 </script>
-
 
 </body>
 </html>
