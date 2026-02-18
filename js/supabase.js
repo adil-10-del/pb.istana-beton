@@ -1,8 +1,5 @@
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2?target=es2020";
-
-window.supabaseClient = createClient(
+// GLOBAL SUPABASE CLIENT (NO MODULE)
+const supabaseClient = window.supabase.createClient(
   "https://tcuimqhiilfervvjfcey.supabase.co",
   "sb_publishable_LINoyHDPvUvWDVB6OHBXWg_1BK_EAIu"
 );
-
-
