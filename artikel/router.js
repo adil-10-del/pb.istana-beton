@@ -1,36 +1,21 @@
-/* =========================================
-   ROUTER SLUG SEO - GITHUB PAGES
-========================================= */
-
-(function(){
-
-  // Ambil path sekarang
+(function () {
   const path = window.location.pathname;
 
-  // Cek apakah buka slug .html
-  if(path.endsWith(".html") && !path.endsWith("post.html")){
+  // contoh: /artikel/cara-pasang-grc.html
+  if (path.includes("/artikel/") && path.endsWith(".html")) {
 
-    // Ambil slug
-    const slug = path.split("/").pop().replace(".html","");
+    if (path.endsWith("post.html") || path.endsWith("index.html") || path.endsWith("submit.html")) {
+      return; // skip template pages
+    }
 
-    // Simpan slug ke session
-    sessionStorage.setItem("artikel_slug", slug);
+    const slug = path.split("/").pop().replace(".html", "");
 
-    // Redirect ke template viewer
+    sessionStorage.setItem("slug", slug);
     window.location.replace("/artikel/post.html");
   }
-
 })();
 
-/* =========================================
-   HELPER GET SLUG
-========================================= */
-function getSlug(){
-  const urlParams = new URLSearchParams(window.location.search);
-  const qSlug = urlParams.get("slug");
-
-  if(qSlug) return qSlug;
-
-  return sessionStorage.getItem("artikel_slug");
+function getSlug() {
+  const params = new URLSearchParams(location.search);
+  return params.get("slug") || sessionStorage.getItem("slug");
 }
-
